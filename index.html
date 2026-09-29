@@ -1,1083 +1,1170 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Visual Studio Code 1.92.0">
-<meta name="googlebot" content="index, follow">
-<meta name="keywords" content="YouTube, video player, videos, media, مشغل فيديوهات, فيديوهات">
 <meta name="author" content="Mohammed Alaa Mohammed">
-<meta name="description" content="Advanced Custom YouTube Video Player with modern UI and pro features.">
-<title>🎬 YouTube Player Pro | Mohammed Alaa</title>
+<meta name="description" content="Advanced custom YouTube player with pro-grade controls, keyboard shortcuts, and cinematic mode.">
+<meta name="theme-color" content="#0e1116">
+<title>YT Studio — Custom Player</title>
 
-<!-- Favicon -->
 <link rel="icon" href="https://cdn.icon-icons.com/icons2/159/PNG/256/multimedia_video_player_22460.png">
-
-<!-- Bootstrap & Font Awesome -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-  /* ================== ROOT & RESET ================== */
-  :root {
-    --bg-1: #0a0a12;
-    --bg-2: #12121f;
-    --bg-3: #1a1a2e;
-    --accent-1: #6a5acd;
-    --accent-2: #00d4ff;
-    --accent-3: #ff3d81;
-    --text: #eaeaf0;
-    --text-dim: #9a9ab0;
-    --success: #00c896;
-    --danger: #ff4757;
-    --warn: #ffa502;
-    --glass: rgba(255, 255, 255, 0.06);
-    --glass-brd: rgba(255, 255, 255, 0.12);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
-    --radius: 14px;
-  }
+/* =========================================================
+   YT Studio — Design tokens
+   Palette: coal / slate / amber-accent (dev-style, non-AI)
+   ========================================================= */
+:root{
+  /* Surfaces */
+  --bg:            #0e1116;
+  --surface-1:     #14181f;
+  --surface-2:     #1a1f28;
+  --surface-3:     #232a35;
+  --line:          #2a323e;
+  --line-soft:     #1f2630;
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Text */
+  --fg:            #e6e9ef;
+  --fg-dim:        #9aa4b2;
+  --fg-mute:       #6b7688;
 
-  html, body {
-    min-height: 100vh;
-    background: radial-gradient(1200px 600px at 10% -10%, #1c1c35 0%, transparent 60%),
-                radial-gradient(1000px 600px at 100% 0%, #14273a 0%, transparent 55%),
-                linear-gradient(180deg, var(--bg-1), var(--bg-2) 60%, #0c0c17);
-    color: var(--text);
-    font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
-    overflow-x: hidden;
-    padding-bottom: 90px;
-  }
+  /* Accents (muted, professional) */
+  --amber:         #e8a13a;
+  --amber-hi:      #ffb84d;
+  --coral:         #e05a4f;
+  --mint:          #4fb286;
+  --sky:           #5a9fd4;
 
-  /* Animated grid background */
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-    background-size: 44px 44px;
-    pointer-events: none;
-    z-index: 0;
-    mask-image: radial-gradient(circle at 50% 30%, #000 40%, transparent 90%);
-  }
+  /* Status */
+  --ok:            #4fb286;
+  --warn:          #e8a13a;
+  --err:           #e05a4f;
 
-  /* Floating blobs */
-  .blob {
-    position: fixed;
-    width: 420px; height: 420px;
-    border-radius: 50%;
-    filter: blur(110px);
-    opacity: .35;
-    z-index: 0;
-    pointer-events: none;
-    animation: float 12s ease-in-out infinite;
-  }
-  .blob.b1 { background: var(--accent-1); top: -120px; left: -120px; }
-  .blob.b2 { background: var(--accent-2); bottom: -140px; right: -140px; animation-delay: -4s; }
-  .blob.b3 { background: var(--accent-3); top: 40%; left: 45%; width: 260px; height: 260px; opacity:.18; animation-delay: -8s; }
-  @keyframes float {
-    0%,100% { transform: translate(0,0) scale(1); }
-    50%     { transform: translate(40px,-30px) scale(1.12); }
-  }
+  /* Radii / motion */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --t-fast: 140ms cubic-bezier(.2,.7,.3,1);
+  --t-base: 220ms cubic-bezier(.2,.7,.3,1);
 
-  .container-app {
-    position: relative;
-    z-index: 1;
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 28px 18px 40px;
-  }
+  /* Elevation */
+  --e1: 0 1px 0 rgba(255,255,255,.04), 0 1px 2px rgba(0,0,0,.5);
+  --e2: 0 4px 12px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.03) inset;
+  --e3: 0 12px 32px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.04) inset;
+}
 
-  /* ================== HEADER ================== */
-  .app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 20px;
-    margin-bottom: 22px;
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    border-radius: var(--radius);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: var(--shadow);
-    flex-wrap: wrap;
-  }
-  .brand {
-    display: flex; align-items: center; gap: 12px;
-  }
-  .brand .logo {
-    width: 46px; height: 46px;
-    display: grid; place-items: center;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    box-shadow: 0 6px 22px rgba(106,90,205,.45);
-    font-size: 22px; color: #fff;
-    animation: pulseGlow 3s ease-in-out infinite;
-  }
-  @keyframes pulseGlow {
-    0%,100% { box-shadow: 0 6px 22px rgba(106,90,205,.45); }
-    50%     { box-shadow: 0 6px 34px rgba(0,212,255,.65); }
-  }
-  .brand h1 {
-    font-size: 19px; font-weight: 800; letter-spacing: .3px;
-    background: linear-gradient(90deg, #fff, var(--accent-2));
-    -webkit-background-clip: text; background-clip: text;
-    color: transparent;
-  }
-  .brand p { font-size: 12px; color: var(--text-dim); }
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 800px at 100% -10%, #182029 0%, transparent 55%),
+    radial-gradient(900px 700px at -10% 100%, #171d24 0%, transparent 50%),
+    var(--bg);
+  color:var(--fg);
+  font-family:'IBM Plex Sans Arabic', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  min-height:100dvh;
+  overflow-x:hidden;
+}
 
-  .header-actions { display: flex; gap: 10px; align-items: center; }
-  .chip {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-size: 12px; padding: 7px 13px;
-    background: rgba(255,255,255,.06);
-    border: 1px solid var(--glass-brd);
-    border-radius: 999px;
-    color: var(--text-dim);
-  }
-  .chip .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--success);
-    box-shadow: 0 0 10px var(--success);
-    animation: blink 1.6s infinite;
-  }
-  @keyframes blink { 50% { opacity: .35; } }
+/* Subtle grain overlay — a dev-touch, not AI */
+body::after{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; z-index:0;
+  opacity:.035;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/></svg>");
+  mix-blend-mode:overlay;
+}
 
-  /* ================== URL BAR ================== */
-  .url-bar {
-    display: flex; gap: 12px; flex-wrap: wrap;
-    align-items: center;
-    padding: 18px;
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    border-radius: var(--radius);
-    backdrop-filter: blur(14px);
-    box-shadow: var(--shadow);
-    margin-bottom: 18px;
-  }
-  .input-wrap {
-    position: relative;
-    flex: 1 1 380px;
-    min-width: 240px;
-  }
-  .input-wrap i.lead-icon {
-    position: absolute; left: 14px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-dim);
-    font-size: 15px;
-  }
-  #videoUrl {
-    width: 100%;
-    padding: 14px 44px 14px 42px;
-    background: rgba(0,0,0,.35);
-    border: 1.5px solid var(--glass-brd);
-    border-radius: 10px;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 500;
-    outline: none;
-    transition: all .25s ease;
-  }
-  #videoUrl::placeholder { color: #6b6b85; }
-  #videoUrl:focus {
-    border-color: transparent;
-    background:
-      linear-gradient(rgba(15,15,25,.95), rgba(15,15,25,.95)) padding-box,
-      linear-gradient(135deg, var(--accent-2), var(--accent-3)) border-box;
-    border: 1.5px solid transparent;
-    box-shadow: 0 0 0 4px rgba(0,212,255,.12), 0 0 30px rgba(0,212,255,.25);
-  }
-  #videoUrl.valid { border-color: var(--success); box-shadow: 0 0 0 4px rgba(0,200,150,.12); }
-  #videoUrl.invalid { border-color: var(--danger); box-shadow: 0 0 0 4px rgba(255,71,87,.15); }
-  .input-wrap .clear-x {
-    position: absolute; right: 12px; top: 50%;
-    transform: translateY(-50%);
-    background: transparent; border: none;
-    color: var(--text-dim); cursor: pointer;
-    font-size: 15px; display: none;
-    padding: 4px;
-  }
-  .input-wrap .clear-x:hover { color: var(--danger); }
+/* =========================
+   Layout
+   ========================= */
+.wrap{
+  position:relative; z-index:1;
+  max-width:1180px;
+  margin:0 auto;
+  padding:22px 18px 96px;
+}
 
-  /* ================== BUTTONS ================== */
-  .btn-pro {
-    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-    padding: 13px 22px;
-    font-size: 14.5px; font-weight: 700;
-    border: none; border-radius: 10px;
-    color: #fff; cursor: pointer;
-    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    box-shadow: 0 6px 20px rgba(106,90,205,.35);
-    transition: all .28s cubic-bezier(.2,.8,.2,1);
-    position: relative; overflow: hidden;
-    white-space: nowrap;
-  }
-  .btn-pro::after {
-    content:""; position:absolute; inset:0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform .6s;
-  }
-  .btn-pro:hover::after { transform: translateX(100%); }
-  .btn-pro:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 30px rgba(106,90,205,.5); }
-  .btn-pro:active { transform: translateY(0) scale(.98); }
+/* Topbar */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:14px; flex-wrap:wrap;
+  padding:14px 18px;
+  background:linear-gradient(180deg, var(--surface-1), var(--surface-2));
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--e2);
+  margin-bottom:18px;
+}
+.topbar__brand{display:flex; align-items:center; gap:12px; min-width:0}
+.topbar__mark{
+  width:40px; height:40px; flex:0 0 40px;
+  display:grid; place-items:center;
+  border-radius:10px;
+  background:#0b0e13;
+  border:1px solid var(--line);
+  color:var(--amber);
+  font-size:18px;
+  box-shadow:inset 0 0 0 1px rgba(232,161,58,.08);
+}
+.topbar__title{
+  font-size:15px; font-weight:700; letter-spacing:.2px;
+  margin:0; color:var(--fg);
+}
+.topbar__subtitle{
+  font-size:12px; color:var(--fg-mute); margin:1px 0 0;
+}
+.topbar__meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
 
-  .btn-ghost {
-    background: rgba(255,255,255,.05);
-    border: 1px solid var(--glass-brd);
-    box-shadow: none;
-  }
-  .btn-ghost:hover { background: rgba(255,255,255,.1); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+/* Chips */
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  height:28px; padding:0 11px;
+  font-size:12px; font-weight:500; color:var(--fg-dim);
+  background:var(--surface-3);
+  border:1px solid var(--line);
+  border-radius:999px;
+}
+.chip--live{color:var(--mint)}
+.chip__dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--mint);
+  box-shadow:0 0 8px rgba(79,178,134,.9);
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{50%{opacity:.35}}
 
-  .btn-danger { background: linear-gradient(135deg, #ff4757, #c0392b); box-shadow: 0 6px 20px rgba(255,71,87,.35); }
-  .btn-success { background: linear-gradient(135deg, var(--success), #009e75); box-shadow: 0 6px 20px rgba(0,200,150,.35); }
-  .btn-warn { background: linear-gradient(135deg, var(--warn), #e67e22); box-shadow: 0 6px 20px rgba(255,165,2,.35); }
+/* =========================
+   URL bar
+   ========================= */
+.urlbar{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:stretch;
+  padding:14px;
+  background:var(--surface-1);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--e1);
+  margin-bottom:18px;
+}
+.field{
+  position:relative; flex:1 1 340px; min-width:220px;
+}
+.field__icon{
+  position:absolute; inset-inline-start:13px; top:50%; translate:0 -50%;
+  color:var(--fg-mute); font-size:14px; pointer-events:none;
+  transition:color var(--t-fast);
+}
+.field__input{
+  width:100%; height:46px;
+  padding:0 40px;
+  background:#0b0e13;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  color:var(--fg);
+  font:500 14px/1 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing:.2px;
+  outline:none;
+  transition:border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+}
+.field__input::placeholder{color:var(--fg-mute); font-family:'IBM Plex Sans Arabic',sans-serif}
+.field__input:focus{
+  border-color:var(--amber);
+  background:#0a0d11;
+  box-shadow:0 0 0 3px rgba(232,161,58,.14);
+}
+.field__input:focus ~ .field__icon{color:var(--amber)}
+.field__input[data-state="valid"]{border-color:var(--mint); box-shadow:0 0 0 3px rgba(79,178,134,.14)}
+.field__input[data-state="invalid"]{border-color:var(--err); box-shadow:0 0 0 3px rgba(224,90,79,.14)}
+.field__clear{
+  position:absolute; inset-inline-end:10px; top:50%; translate:0 -50%;
+  background:transparent; border:0; color:var(--fg-mute);
+  font-size:14px; cursor:pointer; padding:6px; display:none;
+  border-radius:6px; transition:color var(--t-fast), background var(--t-fast);
+}
+.field__clear:hover{color:var(--err); background:rgba(224,90,79,.1)}
+.field__clear[data-show="1"]{display:block}
 
-  /* ================== VIDEO AREA ================== */
-  .player-wrap {
-    position: relative;
-    background: #000;
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 18px 60px rgba(0,0,0,.75), 0 0 0 1px var(--glass-brd);
-    aspect-ratio: 16/9;
-    margin-bottom: 14px;
-  }
-  #player, #player iframe { width: 100%; height: 100%; border: none; display: block; }
+/* =========================
+   Buttons
+   ========================= */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:46px; padding:0 18px;
+  font:600 13.5px/1 'IBM Plex Sans Arabic', sans-serif;
+  color:var(--fg);
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  cursor:pointer;
+  transition:background var(--t-fast), border-color var(--t-fast),
+             color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+  user-select:none; white-space:nowrap;
+}
+.btn:hover{background:var(--surface-3); border-color:#39424f}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+.btn i{font-size:13px}
 
-  .placeholder {
-    position: absolute; inset: 0;
-    display: grid; place-items: center;
-    text-align: center;
-    background:
-      radial-gradient(circle at 50% 40%, rgba(106,90,205,.15), transparent 60%),
-      #0b0b14;
-    z-index: 2;
-    transition: opacity .4s;
-  }
-  .placeholder.hide { opacity: 0; pointer-events: none; }
-  .placeholder i {
-    font-size: 68px;
-    background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
-    -webkit-background-clip: text; background-clip: text;
-    color: transparent;
-    animation: bounce 2.4s ease-in-out infinite;
-  }
-  @keyframes bounce {
-    0%,100% { transform: translateY(0); }
-    50%     { transform: translateY(-12px); }
-  }
-  .placeholder h2 { font-size: 20px; margin-top: 14px; font-weight: 700; }
-  .placeholder p { color: var(--text-dim); font-size: 13.5px; margin-top: 6px; }
+.btn--primary{
+  background:var(--amber);
+  border-color:var(--amber);
+  color:#1a1206;
+  font-weight:700;
+}
+.btn--primary:hover{background:var(--amber-hi); border-color:var(--amber-hi)}
+.btn--primary i{color:#1a1206}
 
-  /* Progress bar overlay */
-  .progress-strip {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 4px; background: rgba(255,255,255,.08);
-    z-index: 3; cursor: pointer;
-  }
-  .progress-strip .fill {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-    box-shadow: 0 0 12px var(--accent-2);
-    transition: width .2s linear;
-  }
+.btn--danger{color:#ffd6d2; border-color:#4a2522}
+.btn--danger:hover{background:#2a1a19; border-color:var(--err); color:#fff}
+.btn--danger i{color:var(--err)}
 
-  /* Loading spinner overlay */
-  .loader {
-    position: absolute; inset: 0;
-    display: none; place-items: center;
-    background: rgba(0,0,0,.55);
-    backdrop-filter: blur(3px);
-    z-index: 4;
-  }
-  .loader.show { display: grid; }
-  .spinner {
-    width: 54px; height: 54px;
-    border: 4px solid rgba(255,255,255,.15);
-    border-top-color: var(--accent-2);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+.btn--ghost{background:transparent}
+.btn--ghost:hover{background:var(--surface-2)}
 
-  /* ================== INFO ROW ================== */
-  .info-row {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-  .info-card {
-    flex: 1 1 180px;
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px;
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    min-width: 0;
-  }
-  .info-card .ic {
-    width: 38px; height: 38px; border-radius: 10px;
-    display: grid; place-items: center;
-    background: linear-gradient(135deg, rgba(106,90,205,.4), rgba(0,212,255,.25));
-    font-size: 16px; color: #fff;
-    flex-shrink: 0;
-  }
-  .info-card .meta { min-width: 0; }
-  .info-card .lbl { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; }
-  .info-card .val { font-size: 15px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+/* =========================
+   Player
+   ========================= */
+.player{
+  position:relative;
+  background:#000;
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  box-shadow:var(--e3);
+  aspect-ratio:16/9;
+  margin-bottom:14px;
+  transition:aspect-ratio var(--t-base);
+}
+.player[data-mode="cinema"]{aspect-ratio:21/9}
+.player iframe{width:100%; height:100%; display:block; border:0}
 
-  /* ================== CONTROLS ================== */
-  .controls-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    padding: 16px;
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    border-radius: var(--radius);
-    backdrop-filter: blur(14px);
-    box-shadow: var(--shadow);
-    margin-bottom: 16px;
-  }
+.player__empty{
+  position:absolute; inset:0; z-index:2;
+  display:grid; place-items:center; text-align:center;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(232,161,58,.06), transparent 60%),
+    #08090c;
+  transition:opacity var(--t-base), visibility var(--t-base);
+}
+.player__empty[hidden]{opacity:0; visibility:hidden; display:grid}
+.player__empty-icon{
+  font-size:56px; color:var(--surface-3);
+  margin-bottom:12px; display:block;
+}
+.player__empty h2{
+  font-size:17px; font-weight:700; color:var(--fg-dim);
+  margin:0 0 4px;
+}
+.player__empty p{
+  font-size:13px; color:var(--fg-mute); margin:0;
+}
 
-  .ctrl-btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 12px 10px;
-    font-size: 13.5px; font-weight: 600;
-    background: rgba(255,255,255,.05);
-    border: 1px solid var(--glass-brd);
-    border-radius: 10px;
-    color: var(--text);
-    cursor: pointer;
-    transition: all .22s ease;
-    white-space: nowrap;
-    min-height: 46px;
-  }
-  .ctrl-btn i { font-size: 14px; color: var(--accent-2); transition: .22s; }
-  .ctrl-btn:hover {
-    background: rgba(106,90,205,.18);
-    border-color: rgba(106,90,205,.6);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(106,90,205,.3);
-  }
-  .ctrl-btn:hover i { color: #fff; transform: scale(1.15); }
-  .ctrl-btn:active { transform: translateY(0) scale(.97); }
-  .ctrl-btn.active {
-    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    border-color: transparent;
-    box-shadow: 0 6px 20px rgba(106,90,205,.5);
-  }
-  .ctrl-btn.active i { color: #fff; }
-  .ctrl-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.player__loader{
+  position:absolute; inset:0; z-index:3;
+  display:none; place-items:center;
+  background:rgba(8,9,12,.7);
+  backdrop-filter:blur(4px);
+}
+.player__loader[data-show="1"]{display:grid}
+.spinner{
+  width:44px; height:44px;
+  border:3px solid rgba(255,255,255,.1);
+  border-top-color:var(--amber);
+  border-radius:50%;
+  animation:spin .9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ================== SPEED & VOLUME PANELS ================== */
-  .panel-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .panel {
-    padding: 16px;
-    background: var(--glass);
-    border: 1px solid var(--glass-brd);
-    border-radius: var(--radius);
-    backdrop-filter: blur(14px);
-    box-shadow: var(--shadow);
-  }
-  .panel h3 {
-    font-size: 13px; font-weight: 700;
-    color: var(--text-dim);
-    text-transform: uppercase; letter-spacing: .8px;
-    margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .panel h3 i { color: var(--accent-2); }
+/* Seek bar */
+.seek{
+  position:absolute; inset-inline:0; bottom:0; height:5px; z-index:4;
+  background:rgba(255,255,255,.06); cursor:pointer;
+}
+.seek:hover{height:8px}
+.seek__fill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg, var(--coral), var(--amber));
+  transition:width 200ms linear;
+  box-shadow:0 0 10px rgba(232,161,58,.5);
+}
+.seek__hover{
+  position:absolute; top:-30px; transform:translateX(-50%);
+  padding:3px 8px; border-radius:5px;
+  background:#0b0e13; border:1px solid var(--line);
+  font:600 11px/1 'JetBrains Mono', monospace; color:var(--fg-dim);
+  pointer-events:none; opacity:0; transition:opacity var(--t-fast);
+}
+.seek:hover .seek__hover{opacity:1}
 
-  .speed-row { display: flex; flex-wrap: wrap; gap: 8px; }
-  .speed-btn {
-    flex: 1 0 auto;
-    padding: 9px 12px;
-    font-size: 13px; font-weight: 700;
-    background: rgba(0,0,0,.3);
-    border: 1px solid var(--glass-brd);
-    border-radius: 8px;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: .2s;
-  }
-  .speed-btn:hover { color: #fff; border-color: var(--accent-2); }
-  .speed-btn.active {
-    background: linear-gradient(135deg, var(--accent-2), var(--accent-1));
-    color: #fff; border-color: transparent;
-    box-shadow: 0 4px 14px rgba(0,212,255,.4);
-  }
+/* =========================
+   Stats row
+   ========================= */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+  gap:10px;
+  margin-bottom:16px;
+}
+.stat{
+  display:flex; align-items:center; gap:11px;
+  padding:12px 14px;
+  background:var(--surface-1);
+  border:1px solid var(--line-soft);
+  border-radius:var(--r-md);
+  transition:border-color var(--t-fast);
+}
+.stat:hover{border-color:var(--line)}
+.stat__ic{
+  width:34px; height:34px; flex:0 0 34px;
+  display:grid; place-items:center;
+  background:#0b0e13;
+  border:1px solid var(--line);
+  border-radius:8px;
+  color:var(--fg-dim); font-size:13px;
+}
+.stat__label{
+  font-size:10.5px; color:var(--fg-mute); text-transform:uppercase;
+  letter-spacing:.7px; font-weight:600; margin-bottom:1px;
+}
+.stat__value{
+  font:700 14px/1.2 'JetBrains Mono', monospace;
+  color:var(--fg); font-variant-numeric:tabular-nums;
+}
 
-  /* Volume slider */
-  .vol-slider {
-    -webkit-appearance: none; appearance: none;
-    width: 100%; height: 6px;
-    background: linear-gradient(90deg, var(--accent-2) 0%, var(--accent-2) 70%, rgba(255,255,255,.1) 70%);
-    border-radius: 999px;
-    outline: none; cursor: pointer;
-    margin-top: 6px;
-  }
-  .vol-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 0 12px var(--accent-2);
-    cursor: pointer;
-    transition: .2s;
-  }
-  .vol-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
-  .vol-slider::-moz-range-thumb {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #fff; border: none;
-    box-shadow: 0 0 12px var(--accent-2);
-    cursor: pointer;
-  }
+/* =========================
+   Console (controls)
+   ========================= */
+.console{
+  padding:14px;
+  background:var(--surface-1);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--e1);
+  margin-bottom:14px;
+}
+.console__head{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px; gap:10px; flex-wrap:wrap;
+}
+.console__title{
+  font-size:11px; font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--fg-mute);
+  display:flex; align-items:center; gap:8px;
+}
+.console__title::before{
+  content:""; width:6px; height:6px; border-radius:50%;
+  background:var(--amber); box-shadow:0 0 8px var(--amber);
+}
 
-  /* ================== FOOTER ================== */
-  footer.app-footer {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    padding: 14px 20px;
-    text-align: center;
-    font-size: 12.5px;
-    color: var(--text-dim);
-    background: rgba(10,10,18,.75);
-    backdrop-filter: blur(16px);
-    border-top: 1px solid var(--glass-brd);
-    z-index: 10;
-  }
-  footer.app-footer strong { color: var(--accent-2); }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(122px, 1fr));
+  gap:8px;
+}
+.ctl{
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  height:42px; padding:0 10px;
+  font:600 12.5px/1 'IBM Plex Sans Arabic', sans-serif;
+  color:var(--fg-dim);
+  background:#0b0e13;
+  border:1px solid var(--line);
+  border-radius:8px;
+  cursor:pointer;
+  transition:all var(--t-fast);
+  white-space:nowrap; overflow:hidden;
+}
+.ctl i{font-size:12px; color:var(--fg-mute); transition:color var(--t-fast)}
+.ctl:hover{
+  color:var(--fg); border-color:#39424f; background:#11161d;
+}
+.ctl:hover i{color:var(--amber)}
+.ctl:active{transform:translateY(1px)}
+.ctl:disabled{opacity:.35; cursor:not-allowed; transform:none}
+.ctl[data-active="1"]{
+  color:#1a1206; background:var(--amber); border-color:var(--amber);
+}
+.ctl[data-active="1"] i{color:#1a1206}
 
-  /* ================== TOAST ================== */
-  .toast-pro {
-    position: fixed; top: 20px; right: 20px;
-    padding: 14px 18px;
-    background: rgba(20,20,35,.95);
-    border: 1px solid var(--glass-brd);
-    border-left: 4px solid var(--accent-2);
-    border-radius: 10px;
-    color: #fff; font-size: 13.5px;
-    box-shadow: var(--shadow);
-    display: flex; align-items: center; gap: 10px;
-    transform: translateX(140%);
-    transition: transform .45s cubic-bezier(.2,.8,.2,1);
-    z-index: 9999;
-    max-width: 340px;
-  }
-  .toast-pro.show { transform: translateX(0); }
-  .toast-pro.success { border-left-color: var(--success); }
-  .toast-pro.error { border-left-color: var(--danger); }
-  .toast-pro.warn { border-left-color: var(--warn); }
+/* =========================
+   Panels (speed / volume / keys)
+   ========================= */
+.panels{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1.4fr;
+  gap:12px;
+}
+@media (max-width:900px){ .panels{grid-template-columns:1fr} }
 
-  /* Shortcut hint */
-  kbd {
-    background: rgba(255,255,255,.1);
-    border: 1px solid var(--glass-brd);
-    border-radius: 5px;
-    padding: 2px 7px;
-    font-size: 11px;
-    font-family: monospace;
-    color: var(--accent-2);
-  }
+.panel{
+  padding:14px 16px;
+  background:var(--surface-1);
+  border:1px solid var(--line-soft);
+  border-radius:var(--r-md);
+}
+.panel__title{
+  display:flex; align-items:center; gap:8px;
+  font-size:11px; font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--fg-mute);
+  margin:0 0 12px;
+}
+.panel__title i{color:var(--amber); font-size:11px}
+.panel__title .spacer{margin-inline-start:auto}
+.panel__value{
+  font:700 12px/1 'JetBrains Mono', monospace;
+  color:var(--amber);
+}
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 10px; }
-  ::-webkit-scrollbar-track { background: #0d0d17; }
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(var(--accent-1), var(--accent-2));
-    border-radius: 999px;
-  }
+.speeds{display:flex; flex-wrap:wrap; gap:6px}
+.speed{
+  flex:1 0 auto; min-width:52px; height:32px;
+  font:600 12px/1 'JetBrains Mono', monospace;
+  color:var(--fg-dim); background:#0b0e13;
+  border:1px solid var(--line); border-radius:6px;
+  cursor:pointer; transition:all var(--t-fast);
+}
+.speed:hover{color:var(--fg); border-color:#39424f}
+.speed[aria-pressed="true"]{
+  background:var(--amber); color:#1a1206; border-color:var(--amber);
+}
 
-  /* Responsive */
-  @media (max-width: 720px) {
-    .app-header { flex-direction: column; align-items: stretch; }
-    .header-actions { justify-content: center; }
-    .brand h1 { font-size: 16px; }
-    .btn-pro { padding: 11px 16px; font-size: 13px; }
-    .ctrl-btn { font-size: 12px; min-height: 42px; }
-  }
+.slider{
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:6px; margin-top:8px;
+  background:linear-gradient(90deg, var(--amber) var(--p,100%), var(--surface-3) var(--p,100%));
+  border-radius:999px; outline:none; cursor:pointer;
+}
+.slider::-webkit-slider-thumb{
+  -webkit-appearance:none; width:16px; height:16px;
+  border-radius:50%; background:#fff; border:2px solid #0b0e13;
+  box-shadow:0 0 0 1px var(--amber), 0 0 10px rgba(232,161,58,.5);
+  cursor:grab; transition:transform var(--t-fast);
+}
+.slider::-webkit-slider-thumb:active{cursor:grabbing; transform:scale(1.1)}
+.slider::-moz-range-thumb{
+  width:16px; height:16px; border-radius:50%; background:#fff;
+  border:2px solid #0b0e13; box-shadow:0 0 0 1px var(--amber); cursor:pointer;
+}
+
+.keys{
+  display:flex; flex-wrap:wrap; gap:6px 12px;
+  font-size:12px; color:var(--fg-mute);
+}
+.keys span{display:inline-flex; align-items:center; gap:5px}
+kbd{
+  display:inline-block; min-width:20px; padding:2px 6px;
+  font:700 10.5px/1.4 'JetBrains Mono', monospace;
+  color:var(--fg-dim); background:#0b0e13;
+  border:1px solid var(--line); border-bottom-width:2px;
+  border-radius:4px; text-align:center;
+}
+
+/* =========================
+   Footer
+   ========================= */
+.foot{
+  position:fixed; inset-inline:0; bottom:0; z-index:20;
+  padding:12px 20px;
+  background:rgba(11,14,19,.85);
+  backdrop-filter:blur(14px);
+  border-top:1px solid var(--line-soft);
+  text-align:center;
+  font-size:12px; color:var(--fg-mute);
+}
+.foot b{color:var(--fg-dim); font-weight:600}
+.foot code{
+  font-family:'JetBrains Mono', monospace; font-size:11px;
+  color:var(--amber); background:#0b0e13; padding:1px 6px;
+  border-radius:4px; border:1px solid var(--line);
+}
+
+/* =========================
+   Toast
+   ========================= */
+.toast{
+  position:fixed; top:18px; inset-inline-end:18px; z-index:9999;
+  display:flex; align-items:center; gap:10px;
+  min-width:240px; max-width:340px;
+  padding:12px 14px;
+  background:#0b0e13;
+  border:1px solid var(--line);
+  border-inline-start:3px solid var(--sky);
+  border-radius:var(--r-md);
+  color:var(--fg); font-size:13px; font-weight:500;
+  box-shadow:var(--e3);
+  transform:translateY(-20px); opacity:0; visibility:hidden;
+  transition:transform var(--t-base), opacity var(--t-base), visibility var(--t-base);
+}
+.toast[data-show="1"]{transform:translateY(0); opacity:1; visibility:visible}
+.toast[data-type="ok"]   {border-inline-start-color:var(--ok)}
+.toast[data-type="warn"] {border-inline-start-color:var(--warn)}
+.toast[data-type="err"]  {border-inline-start-color:var(--err)}
+.toast i{font-size:14px; color:var(--sky)}
+.toast[data-type="ok"] i   {color:var(--ok)}
+.toast[data-type="warn"] i {color:var(--warn)}
+.toast[data-type="err"] i  {color:var(--err)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:10px; height:10px}
+::-webkit-scrollbar-track{background:#0b0e13}
+::-webkit-scrollbar-thumb{
+  background:#2a323e; border-radius:999px; border:2px solid #0b0e13;
+}
+::-webkit-scrollbar-thumb:hover{background:#39424f}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; transition-duration:.01ms !important}
+}
 </style>
 </head>
 <body>
 
-<!-- Background blobs -->
-<div class="blob b1"></div>
-<div class="blob b2"></div>
-<div class="blob b3"></div>
+<div class="wrap">
 
-<div class="container-app">
-
-  <!-- ============ HEADER ============ -->
-  <header class="app-header">
-    <div class="brand">
-      <div class="logo"><i class="fas fa-play"></i></div>
+  <!-- ============== TOPBAR ============== -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <div class="topbar__mark"><i class="fa-solid fa-circle-play"></i></div>
       <div>
-        <h1>YouTube Player Pro</h1>
-        <p>مشغل فيديوهات احترافي • Mohammed Alaa</p>
+        <h1 class="topbar__title">YT Studio</h1>
+        <p class="topbar__subtitle">Custom player • build 5.0</p>
       </div>
     </div>
-    <div class="header-actions">
-      <span class="chip"><span class="dot"></span> API Ready</span>
-      <span class="chip"><i class="fas fa-bolt" style="color:#ffa502"></i> v4.0</span>
+    <div class="topbar__meta">
+      <span class="chip chip--live"><span class="chip__dot"></span>API online</span>
+      <span class="chip"><i class="fa-solid fa-code-branch"></i>main</span>
     </div>
   </header>
 
-  <!-- ============ URL INPUT ============ -->
-  <div class="url-bar">
-    <div class="input-wrap">
-      <i class="fas fa-link lead-icon"></i>
-      <input type="text" id="videoUrl" placeholder="الصق رابط يوتيوب هنا... (youtube.com/watch أو youtu.be)" autocomplete="off" spellcheck="false">
-      <button class="clear-x" id="clearX" title="مسح"><i class="fas fa-times-circle"></i></button>
+  <!-- ============== URL BAR ============== -->
+  <section class="urlbar" aria-label="Video URL">
+    <div class="field">
+      <i class="fa-solid fa-link field__icon"></i>
+      <input id="videoUrl" class="field__input" type="text"
+             placeholder="https://youtube.com/watch?v=..."
+             autocomplete="off" spellcheck="false" aria-label="YouTube URL">
+      <button class="field__clear" id="clearField" type="button" aria-label="Clear">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
-    <button class="btn-pro" id="loadVideoBtn"><i class="fas fa-play-circle"></i> تشغيل الفيديو</button>
-    <button class="btn-pro btn-ghost" id="randomBtn" title="رابط عشوائي"><i class="fas fa-dice"></i> عشوائي</button>
-    <button class="btn-pro btn-danger" id="clearBtn"><i class="fas fa-eraser"></i> مسح</button>
-  </div>
+    <button class="btn btn--primary" id="loadBtn" type="button">
+      <i class="fa-solid fa-play"></i>تحميل
+    </button>
+    <button class="btn" id="randomBtn" type="button" title="فيديو عشوائي">
+      <i class="fa-solid fa-shuffle"></i>عشوائي
+    </button>
+    <button class="btn btn--danger" id="resetBtn" type="button">
+      <i class="fa-solid fa-rotate-left"></i>مسح
+    </button>
+  </section>
 
-  <!-- ============ VIDEO PLAYER ============ -->
-  <div class="player-wrap" id="playerWrap">
-    <div class="placeholder" id="placeholder">
+  <!-- ============== PLAYER ============== -->
+  <section class="player" id="playerFrame" aria-label="Player">
+    <div class="player__empty" id="emptyState">
       <div>
-        <i class="fas fa-film"></i>
-        <h2>جاهز للتشغيل</h2>
-        <p>الصق رابط الفيديو أو اضغط "عشوائي" للبدء</p>
+        <i class="fa-regular fa-circle-play player__empty-icon"></i>
+        <h2>لا يوجد فيديو</h2>
+        <p>الصق رابط يوتيوب في الأعلى للبدء</p>
       </div>
     </div>
-    <div class="loader" id="loader"><div class="spinner"></div></div>
+    <div class="player__loader" id="loader"><div class="spinner"></div></div>
     <div id="player"></div>
-    <div class="progress-strip" id="progressStrip"><div class="fill" id="progressFill"></div></div>
-  </div>
+    <div class="seek" id="seek" role="slider" aria-label="Seek">
+      <div class="seek__fill" id="seekFill"></div>
+      <div class="seek__hover" id="seekHover">00:00</div>
+    </div>
+  </section>
 
-  <!-- ============ INFO ROW ============ -->
-  <div class="info-row">
-    <div class="info-card">
-      <div class="ic"><i class="fas fa-clock"></i></div>
-      <div class="meta">
-        <div class="lbl">Current Time</div>
-        <div class="val" id="currentTime">00:00</div>
+  <!-- ============== STATS ============== -->
+  <section class="stats" aria-label="Playback stats">
+    <div class="stat">
+      <div class="stat__ic"><i class="fa-solid fa-play"></i></div>
+      <div>
+        <div class="stat__label">Current</div>
+        <div class="stat__value" id="tCurrent">00:00</div>
       </div>
     </div>
-    <div class="info-card">
-      <div class="ic"><i class="fas fa-hourglass-half"></i></div>
-      <div class="meta">
-        <div class="lbl">Remaining</div>
-        <div class="val" id="remainingTime">00:00</div>
+    <div class="stat">
+      <div class="stat__ic"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div>
+        <div class="stat__label">Remaining</div>
+        <div class="stat__value" id="tRemain">00:00</div>
       </div>
     </div>
-    <div class="info-card">
-      <div class="ic"><i class="fas fa-hourglass-end"></i></div>
-      <div class="meta">
-        <div class="lbl">Duration</div>
-        <div class="val" id="totalTime">00:00</div>
+    <div class="stat">
+      <div class="stat__ic"><i class="fa-solid fa-flag-checkered"></i></div>
+      <div>
+        <div class="stat__label">Duration</div>
+        <div class="stat__value" id="tTotal">00:00</div>
       </div>
     </div>
-    <div class="info-card">
-      <div class="ic"><i class="fas fa-signal"></i></div>
-      <div class="meta">
-        <div class="lbl">Status</div>
-        <div class="val" id="statusText">—</div>
+    <div class="stat">
+      <div class="stat__ic"><i class="fa-solid fa-wave-square"></i></div>
+      <div>
+        <div class="stat__label">State</div>
+        <div class="stat__value" id="tState">—</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ============ CONTROL BUTTONS ============ -->
-  <div class="controls-grid">
-    <button class="ctrl-btn" id="playPauseBtn" disabled><i class="fas fa-play"></i> تشغيل</button>
-    <button class="ctrl-btn" id="stopBtn" disabled><i class="fas fa-stop"></i> إيقاف</button>
-    <button class="ctrl-btn" id="muteBtn" disabled><i class="fas fa-volume-mute"></i> كتم</button>
-    <button class="ctrl-btn" id="fullscreenBtn" disabled><i class="fas fa-expand"></i> ملء الشاشة</button>
-    <button class="ctrl-btn" id="loopBtn" disabled><i class="fas fa-redo"></i> تكرار</button>
-    <button class="ctrl-btn" id="reloadBtn" disabled><i class="fas fa-sync-alt"></i> إعادة</button>
-    <button class="ctrl-btn" id="back10Btn" disabled><i class="fas fa-undo"></i> -10s</button>
-    <button class="ctrl-btn" id="fwd10Btn" disabled><i class="fas fa-redo-alt"></i> +10s</button>
-    <button class="ctrl-btn" id="pipBtn" disabled><i class="fas fa-clone"></i> PiP</button>
-    <button class="ctrl-btn" id="theaterBtn" disabled><i class="fas fa-tv"></i> Theater</button>
-  </div>
-
-  <!-- ============ SPEED & VOLUME ============ -->
-  <div class="panel-row">
-    <div class="panel">
-      <h3><i class="fas fa-tachometer-alt"></i> سرعة التشغيل</h3>
-      <div class="speed-row" id="speedRow">
-        <button class="speed-btn" data-speed="0.25">0.25x</button>
-        <button class="speed-btn" data-speed="0.5">0.5x</button>
-        <button class="speed-btn" data-speed="0.75">0.75x</button>
-        <button class="speed-btn active" data-speed="1">1x</button>
-        <button class="speed-btn" data-speed="1.25">1.25x</button>
-        <button class="speed-btn" data-speed="1.5">1.5x</button>
-        <button class="speed-btn" data-speed="2">2x</button>
+  <!-- ============== CONSOLE ============== -->
+  <section class="console" aria-label="Controls">
+    <div class="console__head">
+      <div class="console__title">Console</div>
+      <div style="font-size:11px;color:var(--fg-mute)">
+        اضغط <kbd>?</kbd> لعرض الاختصارات
       </div>
     </div>
 
-    <div class="panel">
-      <h3><i class="fas fa-volume-up"></i> مستوى الصوت <span id="volLabel" style="color:var(--accent-2);margin-left:auto">100%</span></h3>
-      <input type="range" min="0" max="100" value="100" class="vol-slider" id="volSlider">
+    <div class="grid">
+      <button class="ctl" id="btnPlay"    disabled><i class="fa-solid fa-play"></i>تشغيل</button>
+      <button class="ctl" id="btnStop"    disabled><i class="fa-solid fa-stop"></i>إيقاف</button>
+      <button class="ctl" id="btnBack"    disabled><i class="fa-solid fa-backward"></i>10s -</button>
+      <button class="ctl" id="btnFwd"     disabled><i class="fa-solid fa-forward"></i>10s +</button>
+      <button class="ctl" id="btnMute"    disabled><i class="fa-solid fa-volume-high"></i>كتم</button>
+      <button class="ctl" id="btnLoop"    disabled><i class="fa-solid fa-repeat"></i>تكرار</button>
+      <button class="ctl" id="btnCinema"  disabled><i class="fa-solid fa-film"></i>سينما</button>
+      <button class="ctl" id="btnPip"     disabled><i class="fa-solid fa-clone"></i>PiP</button>
+      <button class="ctl" id="btnFull"    disabled><i class="fa-solid fa-expand"></i>ملء</button>
+      <button class="ctl" id="btnReload"  disabled><i class="fa-solid fa-arrows-rotate"></i>إعادة</button>
     </div>
+  </section>
+
+  <!-- ============== PANELS ============== -->
+  <section class="panels">
 
     <div class="panel">
-      <h3><i class="fas fa-keyboard"></i> اختصارات لوحة المفاتيح</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--text-dim)">
-        <span><kbd>Space</kbd> تشغيل/إيقاف</span>
-        <span><kbd>←</kbd>/<kbd>→</kbd> ±5s</span>
-        <span><kbd>↑</kbd>/<kbd>↓</kbd> الصوت</span>
-        <span><kbd>M</kbd> كتم</span>
-        <span><kbd>F</kbd> ملء الشاشة</span>
-        <span><kbd>L</kbd> تكرار</span>
+      <h3 class="panel__title"><i class="fa-solid fa-gauge-high"></i>Speed</h3>
+      <div class="speeds" id="speeds" role="group" aria-label="Playback speed">
+        <button class="speed" data-speed="0.25" aria-pressed="false">0.25</button>
+        <button class="speed" data-speed="0.5"  aria-pressed="false">0.5</button>
+        <button class="speed" data-speed="0.75" aria-pressed="false">0.75</button>
+        <button class="speed" data-speed="1"    aria-pressed="true">1.0</button>
+        <button class="speed" data-speed="1.25" aria-pressed="false">1.25</button>
+        <button class="speed" data-speed="1.5"  aria-pressed="false">1.5</button>
+        <button class="speed" data-speed="2"    aria-pressed="false">2.0</button>
       </div>
     </div>
-  </div>
+
+    <div class="panel">
+      <h3 class="panel__title">
+        <i class="fa-solid fa-volume-high"></i>Volume
+        <span class="spacer"></span>
+        <span class="panel__value" id="volValue">100</span>
+      </h3>
+      <input type="range" min="0" max="100" value="100" class="slider" id="volRange" aria-label="Volume">
+    </div>
+
+    <div class="panel">
+      <h3 class="panel__title"><i class="fa-solid fa-keyboard"></i>Shortcuts</h3>
+      <div class="keys">
+        <span><kbd>Space</kbd> play</span>
+        <span><kbd>←</kbd><kbd>→</kbd> ±5s</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> vol</span>
+        <span><kbd>M</kbd> mute</span>
+        <span><kbd>F</kbd> full</span>
+        <span><kbd>L</kbd> loop</span>
+      </div>
+    </div>
+
+  </section>
 
 </div>
 
-<!-- ============ FOOTER ============ -->
-<footer class="app-footer">
-  &copy; 2024 <strong>Mohammed Alaa</strong> — All Rights Reserved &nbsp;|&nbsp; <sub>Version 4.0 Pro</sub>
+<!-- ============== FOOTER ============== -->
+<footer class="foot">
+  &copy; 2024 <b>Mohammed Alaa</b> — <code>yt-studio@5.0</code>
 </footer>
 
-<!-- Toast -->
-<div class="toast-pro" id="toast"><i class="fas fa-info-circle"></i><span id="toastMsg">Message</span></div>
+<!-- ============== TOAST ============== -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <i class="fa-solid fa-circle-info"></i>
+  <span id="toastMsg">Message</span>
+</div>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-/* ================================================================
-   YouTube Player Pro v4.0
-   ================================================================ */
+/* =========================================================================
+   YT Studio — player controller
+   -------------------------------------------------------------------------
+   Author: Mohammed Alaa
+   Notes : - IIFE scope, no globals except onYouTubeIframeAPIReady
+           - All state kept local; DOM cached once
+           - Uses data-* attributes for state (no style writes for toggles)
+   ========================================================================= */
 (() => {
-  "use strict";
+  'use strict';
 
-  /* ---------- DOM ---------- */
-  const $ = id => document.getElementById(id);
-  const videoUrlInput = $("videoUrl");
-  const clearX        = $("clearX");
-  const loadVideoBtn  = $("loadVideoBtn");
-  const randomBtn     = $("randomBtn");
-  const clearBtn      = $("clearBtn");
-  const placeholder   = $("placeholder");
-  const loader        = $("loader");
-  const playerWrap    = $("playerWrap");
-  const progressStrip = $("progressStrip");
-  const progressFill  = $("progressFill");
+  /* ---------- Tiny DOM helpers ---------- */
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  const currentTimeEl = $("currentTime");
-  const remainingTimeEl = $("remainingTime");
-  const totalTimeEl   = $("totalTime");
-  const statusTextEl  = $("statusText");
+  const setState = (el, state) => {
+    if (state === null || state === undefined) el.removeAttribute('data-state');
+    else el.setAttribute('data-state', state);
+  };
 
-  const playPauseBtn  = $("playPauseBtn");
-  const stopBtn       = $("stopBtn");
-  const muteBtn       = $("muteBtn");
-  const fullscreenBtn = $("fullscreenBtn");
-  const loopBtn       = $("loopBtn");
-  const reloadBtn     = $("reloadBtn");
-  const back10Btn     = $("back10Btn");
-  const fwd10Btn      = $("fwd10Btn");
-  const pipBtn        = $("pipBtn");
-  const theaterBtn    = $("theaterBtn");
-  const volSlider     = $("volSlider");
-  const volLabel      = $("volLabel");
-  const speedRow      = $("speedRow");
+  /* ---------- Cached refs ---------- */
+  const dom = {
+    url:      $('#videoUrl'),
+    fieldClear: $('#clearField'),
+    load:     $('#loadBtn'),
+    random:   $('#randomBtn'),
+    reset:    $('#resetBtn'),
 
-  /* ---------- STATE ---------- */
-  let ytPlayer = null;
-  let isPlaying = false;
-  let isMuted = false;
-  let isLooping = false;
-  let timeInterval = null;
-  let currentSpeed = 1;
-  let isTheater = false;
+    frame:    $('#playerFrame'),
+    holder:   $('#player'),
+    empty:    $('#emptyState'),
+    loader:   $('#loader'),
+    seek:     $('#seek'),
+    seekFill: $('#seekFill'),
+    seekHover:$('#seekHover'),
 
-  /* ---------- TOAST ---------- */
-  const toastEl = $("toast");
-  const toastMsg = $("toastMsg");
-  let toastTimer;
-  function toast(msg, type = "info", dur = 2500) {
-    clearTimeout(toastTimer);
-    toastEl.className = "toast-pro " + type;
-    toastMsg.textContent = msg;
-    toastEl.querySelector("i").className =
-      type === "success" ? "fas fa-check-circle" :
-      type === "error"   ? "fas fa-times-circle" :
-      type === "warn"    ? "fas fa-exclamation-triangle" :
-                           "fas fa-info-circle";
-    toastEl.classList.add("show");
-    toastTimer = setTimeout(() => toastEl.classList.remove("show"), dur);
+    tCur:     $('#tCurrent'),
+    tRem:     $('#tRemain'),
+    tTot:     $('#tTotal'),
+    tState:   $('#tState'),
+
+    btnPlay:  $('#btnPlay'),
+    btnStop:  $('#btnStop'),
+    btnBack:  $('#btnBack'),
+    btnFwd:   $('#btnFwd'),
+    btnMute:  $('#btnMute'),
+    btnLoop:  $('#btnLoop'),
+    btnCinema:$('#btnCinema'),
+    btnPip:   $('#btnPip'),
+    btnFull:  $('#btnFull'),
+    btnReload:$('#btnReload'),
+
+    speeds:   $('#speeds'),
+    vol:      $('#volRange'),
+    volValue: $('#volValue'),
+
+    toast:    $('#toast'),
+    toastMsg: $('#toastMsg')
+  };
+
+  /* ---------- State ---------- */
+  const state = {
+    player:      null,
+    ready:       false,
+    playing:     false,
+    muted:       false,
+    looping:     false,
+    cinema:      false,
+    speed:       1,
+    tick:        null,
+    toastTimer:  null
+  };
+
+  /* ---------- Toast ---------- */
+  function toast(msg, type = 'info', ms = 2200) {
+    clearTimeout(state.toastTimer);
+    dom.toastMsg.textContent = msg;
+    dom.toast.setAttribute('data-type', type);
+    const icon = dom.toast.querySelector('i');
+    icon.className =
+      type === 'ok'   ? 'fa-solid fa-circle-check' :
+      type === 'warn' ? 'fa-solid fa-triangle-exclamation' :
+      type === 'err'  ? 'fa-solid fa-circle-xmark' :
+                        'fa-solid fa-circle-info';
+    dom.toast.setAttribute('data-show', '1');
+    state.toastTimer = setTimeout(() => dom.toast.removeAttribute('data-show'), ms);
   }
 
-  /* ---------- URL PARSER ---------- */
-  function getYouTubeVideoID(url) {
-    if (!url) return null;
+  /* ---------- URL parser (multiple YouTube formats) ---------- */
+  const RE_ID = /^[A-Za-z0-9_-]{11}$/;
+  function parseYouTubeId(raw) {
+    if (!raw) return null;
+    const s = raw.trim();
+    if (RE_ID.test(s)) return s;
+
     const patterns = [
-      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
-      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/
+      /youtube\.com\/watch\?(?:.*&)?v=([A-Za-z0-9_-]{11})/,
+      /youtu\.be\/([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/live\/([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/v\/([A-Za-z0-9_-]{11})/
     ];
-    for (const p of patterns) {
-      const m = url.match(p);
+    for (const re of patterns) {
+      const m = s.match(re);
       if (m) return m[1];
     }
-    // إذا كان المعرّف مباشراً (11 حرفاً)
-    if (/^[a-zA-Z0-9_-]{11}$/.test(url.trim())) return url.trim();
     return null;
   }
 
-  /* ---------- INPUT VALIDATION ---------- */
-  function checkUrlInput() {
-    const v = videoUrlInput.value.trim();
-    videoUrlInput.classList.remove("valid", "invalid");
-    clearX.style.display = v ? "block" : "none";
-    if (!v) return;
-    if (getYouTubeVideoID(v)) videoUrlInput.classList.add("valid");
-    else videoUrlInput.classList.add("invalid");
+  /* ---------- Validation UI ---------- */
+  function validateField() {
+    const val = dom.url.value.trim();
+    dom.fieldClear.setAttribute('data-show', val ? '1' : '0');
+    if (!val) { setState(dom.url, null); return null; }
+    const id = parseYouTubeId(val);
+    setState(dom.url, id ? 'valid' : 'invalid');
+    return id;
   }
-  videoUrlInput.addEventListener("input", checkUrlInput);
-  clearX.addEventListener("click", () => {
-    videoUrlInput.value = "";
-    checkUrlInput();
-    videoUrlInput.focus();
-  });
 
-  /* ---------- LOAD VIDEO ---------- */
-  function loadVideo(videoID) {
-    if (!videoID) return;
-    loader.classList.add("show");
+  /* ---------- Time format ---------- */
+  const pad = n => String(Math.floor(n)).padStart(2, '0');
+  function fmt(sec) {
+    sec = Math.max(0, Math.floor(sec || 0));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    return h ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+  }
 
-    if (ytPlayer && ytPlayer.destroy) {
-      try { ytPlayer.destroy(); } catch(e) {}
+  /* ---------- Loader toggle ---------- */
+  const showLoader = on => dom.loader.setAttribute('data-show', on ? '1' : '0');
+
+  /* ---------- Enable/disable controls ---------- */
+  function setControlsEnabled(on) {
+    [
+      dom.btnPlay, dom.btnStop, dom.btnBack, dom.btnFwd,
+      dom.btnMute, dom.btnLoop, dom.btnCinema, dom.btnPip,
+      dom.btnFull, dom.btnReload
+    ].forEach(b => b.disabled = !on);
+  }
+
+  /* ---------- Player bootstrap ---------- */
+  function ensurePlayer() {
+    if (state.player) return Promise.resolve();
+    return new Promise(resolve => {
+      const check = () => {
+        if (window.YT && window.YT.Player) resolve();
+        else setTimeout(check, 80);
+      };
+      check();
+    });
+  }
+
+  async function loadVideo(id) {
+    showLoader(true);
+
+    if (state.player && state.player.destroy) {
+      try { state.player.destroy(); } catch (_) {}
+      state.player = null;
     }
-    $("player").innerHTML = "";
+    dom.holder.innerHTML = '';
 
-    ytPlayer = new YT.Player("player", {
-      videoId: videoID,
+    await ensurePlayer();
+
+    state.player = new YT.Player('player', {
+      videoId: id,
       playerVars: {
         autoplay: 1,
         rel: 0,
         modestbranding: 1,
         playsinline: 1,
+        iv_load_policy: 3,
         origin: location.origin
       },
       events: {
-        onReady: onPlayerReady,
-        onStateChange: onPlayerStateChange,
-        onError: onPlayerError
+        onReady:       onReady,
+        onStateChange: onStateChange,
+        onError:       onError
       }
     });
   }
 
-  function onPlayerReady() {
-    loader.classList.remove("show");
-    placeholder.classList.add("hide");
+  /* ---------- Player events ---------- */
+  function onReady() {
+    state.ready = true;
+    showLoader(false);
+    dom.empty.hidden = true;
+    setControlsEnabled(true);
 
-    const btns = [playPauseBtn, stopBtn, muteBtn, fullscreenBtn, loopBtn,
-                  reloadBtn, back10Btn, fwd10Btn, pipBtn, theaterBtn];
-    btns.forEach(b => b.disabled = false);
+    state.player.setVolume(100);
+    state.player.setPlaybackRate(state.speed);
+    state.player.playVideo();
 
-    if (ytPlayer.setVolume) ytPlayer.setVolume(100);
-    if (ytPlayer.playVideo) ytPlayer.playVideo();
+    clearInterval(state.tick);
+    state.tick = setInterval(tick, 400);
 
-    clearInterval(timeInterval);
-    timeInterval = setInterval(updateTime, 500);
-
-    toast("تم تحميل الفيديو بنجاح ✨", "success");
+    toast('الفيديو جاهز', 'ok', 1400);
   }
 
-  function onPlayerError(e) {
-    loader.classList.remove("show");
-    const codes = {
-      2: "رابط غير صالح",
-      5: "خطأ في مشغل HTML5",
-      100: "الفيديو غير موجود أو خاص",
-      101: "صاحب الفيديو غير مسموح بالتضمين",
-      150: "الفيديو غير مسموح بتضمينه"
+  function onStateChange(ev) {
+    const S = YT.PlayerState;
+    switch (ev.data) {
+      case S.PLAYING:
+        state.playing = true;
+        dom.btnPlay.innerHTML = '<i class="fa-solid fa-pause"></i>إيقاف';
+        dom.tState.textContent = 'playing';
+        dom.empty.hidden = true;
+        break;
+      case S.PAUSED:
+        state.playing = false;
+        dom.btnPlay.innerHTML = '<i class="fa-solid fa-play"></i>تشغيل';
+        dom.tState.textContent = 'paused';
+        break;
+      case S.ENDED:
+        state.playing = false;
+        dom.btnPlay.innerHTML = '<i class="fa-solid fa-play"></i>تشغيل';
+        dom.tState.textContent = 'ended';
+        if (state.looping) { state.player.seekTo(0); state.player.playVideo(); }
+        break;
+      case S.BUFFERING:
+        dom.tState.textContent = 'buffering';
+        break;
+      case S.CUED:
+        dom.tState.textContent = 'cued';
+        break;
+    }
+  }
+
+  function onError(ev) {
+    showLoader(false);
+    const map = {
+      2:   'معرّف الفيديو غير صالح',
+      5:   'تعذّر تشغيل مشغل HTML5',
+      100: 'الفيديو غير موجود أو محذوف',
+      101: 'المالك لا يسمح بالتضمين',
+      150: 'المالك لا يسمح بالتضمين'
     };
     Swal.fire({
-      title: "خطأ في الفيديو",
-      text: codes[e.data] || "خطأ غير معروف",
-      icon: "error",
-      confirmButtonColor: "#6a5acd"
+      title: 'خطأ في الفيديو',
+      text: map[ev.data] || 'حدث خطأ غير متوقع',
+      icon: 'error',
+      background: '#14181f',
+      color: '#e6e9ef',
+      confirmButtonColor: '#e8a13a',
+      confirmButtonText: 'حسناً'
     });
   }
 
-  function onPlayerStateChange(event) {
-    const S = YT.PlayerState;
-    if (event.data === S.PLAYING) {
-      isPlaying = true;
-      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> إيقاف مؤقت';
-      statusTextEl.textContent = "قيد التشغيل";
-      placeholder.classList.add("hide");
-    } else if (event.data === S.PAUSED) {
-      isPlaying = false;
-      playPauseBtn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
-      statusTextEl.textContent = "متوقف مؤقتاً";
-    } else if (event.data === S.ENDED) {
-      isPlaying = false;
-      playPauseBtn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
-      statusTextEl.textContent = "انتهى";
-      if (isLooping) {
-        ytPlayer.seekTo(0);
-        ytPlayer.playVideo();
-      }
-    } else if (event.data === S.BUFFERING) {
-      statusTextEl.textContent = "تحميل...";
-    } else if (event.data === S.CUED) {
-      statusTextEl.textContent = "جاهز";
-    }
-  }
-
-  /* ---------- TIME UPDATE ---------- */
-  function updateTime() {
-    if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+  /* ---------- Tick loop ---------- */
+  function tick() {
+    if (!state.player || !state.player.getCurrentTime) return;
     try {
-      const cur = ytPlayer.getCurrentTime() || 0;
-      const dur = ytPlayer.getDuration() || 0;
+      const cur = state.player.getCurrentTime() || 0;
+      const dur = state.player.getDuration() || 0;
       const rem = Math.max(dur - cur, 0);
-      currentTimeEl.textContent = fmt(cur);
-      remainingTimeEl.textContent = "-" + fmt(rem);
-      totalTimeEl.textContent = fmt(dur);
-      if (dur > 0) {
-        progressFill.style.width = ((cur / dur) * 100) + "%";
-      }
-    } catch(e) {}
+
+      dom.tCur.textContent = fmt(cur);
+      dom.tRem.textContent = '-' + fmt(rem);
+      dom.tTot.textContent = fmt(dur);
+
+      if (dur > 0) dom.seekFill.style.width = ((cur / dur) * 100).toFixed(2) + '%';
+    } catch (_) { /* player may be transiting */ }
   }
 
-  function fmt(s) {
-    s = Math.floor(s);
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    const pad = n => String(n).padStart(2, "0");
-    return h > 0 ? `${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+  /* ---------- Seek interactions ---------- */
+  function seekRatioFromEvent(ev) {
+    const r = dom.seek.getBoundingClientRect();
+    return Math.min(1, Math.max(0, (ev.clientX - r.left) / r.width));
   }
 
-  /* ---------- PROGRESS SEEK ---------- */
-  progressStrip.addEventListener("click", (e) => {
-    if (!ytPlayer || !ytPlayer.getDuration) return;
-    const rect = progressStrip.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    const dur = ytPlayer.getDuration();
-    if (dur) ytPlayer.seekTo(dur * pct, true);
+  dom.seek.addEventListener('click', ev => {
+    if (!state.player || !state.player.getDuration) return;
+    const dur = state.player.getDuration();
+    if (dur) state.player.seekTo(dur * seekRatioFromEvent(ev), true);
   });
 
-  /* ---------- CONTROLS ---------- */
-  playPauseBtn.addEventListener("click", () => {
-    if (!ytPlayer) return;
-    isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+  dom.seek.addEventListener('mousemove', ev => {
+    if (!state.player || !state.player.getDuration) return;
+    const dur = state.player.getDuration();
+    dom.seekHover.style.left = ev.clientX - dom.seek.getBoundingClientRect().left + 'px';
+    dom.seekHover.textContent = fmt(dur * seekRatioFromEvent(ev));
   });
 
-  stopBtn.addEventListener("click", () => {
-    if (!ytPlayer) return;
-    ytPlayer.stopVideo();
-    isPlaying = false;
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
-    statusTextEl.textContent = "متوقف";
+  /* ---------- Controls ---------- */
+  dom.btnPlay.addEventListener('click', () => {
+    if (!state.player) return;
+    state.playing ? state.player.pauseVideo() : state.player.playVideo();
   });
 
-  muteBtn.addEventListener("click", () => {
-    if (!ytPlayer) return;
-    if (isMuted) {
-      ytPlayer.unMute();
-      isMuted = false;
-      muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i> كتم';
+  dom.btnStop.addEventListener('click', () => {
+    if (!state.player) return;
+    state.player.stopVideo();
+    state.playing = false;
+    dom.btnPlay.innerHTML = '<i class="fa-solid fa-play"></i>تشغيل';
+    dom.tState.textContent = 'stopped';
+  });
+
+  dom.btnBack.addEventListener('click', () => {
+    if (!state.player) return;
+    state.player.seekTo(Math.max(0, state.player.getCurrentTime() - 10), true);
+  });
+
+  dom.btnFwd.addEventListener('click', () => {
+    if (!state.player) return;
+    state.player.seekTo(state.player.getCurrentTime() + 10, true);
+  });
+
+  dom.btnMute.addEventListener('click', () => {
+    if (!state.player) return;
+    if (state.muted) {
+      state.player.unMute();
+      state.muted = false;
+      dom.btnMute.innerHTML = '<i class="fa-solid fa-volume-high"></i>كتم';
     } else {
-      ytPlayer.mute();
-      isMuted = true;
-      muteBtn.innerHTML = '<i class="fas fa-volume-up"></i> فتح الصوت';
+      state.player.mute();
+      state.muted = true;
+      dom.btnMute.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>فتح';
     }
   });
 
-  fullscreenBtn.addEventListener("click", () => {
-    const el = playerWrap;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else if (el.requestFullscreen) {
-      el.requestFullscreen();
-    } else if (el.webkitRequestFullscreen) {
-      el.webkitRequestFullscreen();
-    }
+  dom.btnLoop.addEventListener('click', () => {
+    state.looping = !state.looping;
+    dom.btnLoop.toggleAttribute('data-active', state.looping);
+    toast(state.looping ? 'التكرار مفعّل' : 'التكرار موقوف', 'info', 1400);
   });
 
-  loopBtn.addEventListener("click", () => {
-    isLooping = !isLooping;
-    loopBtn.classList.toggle("active", isLooping);
-    toast(isLooping ? "🔁 تم تفعيل التكرار" : "تم إيقاف التكرار", "info", 1800);
+  dom.btnCinema.addEventListener('click', () => {
+    state.cinema = !state.cinema;
+    dom.frame.setAttribute('data-mode', state.cinema ? 'cinema' : 'normal');
+    dom.btnCinema.toggleAttribute('data-active', state.cinema);
+    toast(state.cinema ? 'وضع السينما' : 'الوضع العادي', 'info', 1400);
   });
 
-  reloadBtn.addEventListener("click", () => {
-    const id = getYouTubeVideoID(videoUrlInput.value);
-    if (id) {
-      loadVideo(id);
-      toast("جاري إعادة التحميل...", "info", 1500);
-    } else {
-      toast("لا يوجد فيديو محمّل", "warn");
-    }
-  });
-
-  back10Btn.addEventListener("click", () => {
-    if (!ytPlayer) return;
-    const t = ytPlayer.getCurrentTime() || 0;
-    ytPlayer.seekTo(Math.max(0, t - 10), true);
-  });
-
-  fwd10Btn.addEventListener("click", () => {
-    if (!ytPlayer) return;
-    const t = ytPlayer.getCurrentTime() || 0;
-    ytPlayer.seekTo(t + 10, true);
-  });
-
-  pipBtn.addEventListener("click", async () => {
+  dom.btnPip.addEventListener('click', async () => {
     try {
-      const iframe = document.querySelector("#player iframe");
+      const iframe = $('#player iframe');
       if (!iframe) return;
-      if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture();
-      } else if (document.pictureInPictureEnabled) {
-        await iframe.requestPictureInPicture();
-      } else {
-        toast("PiP غير مدعوم في هذا المتصفح", "warn");
-      }
-    } catch(e) {
-      toast("تعذّر تفعيل PiP", "error");
+      if (document.pictureInPictureElement) await document.exitPictureInPicture();
+      else if (document.pictureInPictureEnabled) await iframe.requestPictureInPicture();
+      else toast('PiP غير مدعوم هنا', 'warn');
+    } catch (_) {
+      toast('تعذّر تفعيل PiP', 'err');
     }
   });
 
-  theaterBtn.addEventListener("click", () => {
-    isTheater = !isTheater;
-    theaterBtn.classList.toggle("active", isTheater);
-    playerWrap.style.aspectRatio = isTheater ? "21/9" : "16/9";
-    toast(isTheater ? "🎬 وضع السينما" : "الوضع العادي", "info", 1500);
+  dom.btnFull.addEventListener('click', () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (dom.frame.requestFullscreen) dom.frame.requestFullscreen();
+    else if (dom.frame.webkitRequestFullscreen) dom.frame.webkitRequestFullscreen();
   });
 
-  /* ---------- VOLUME ---------- */
-  volSlider.addEventListener("input", () => {
-    const v = parseInt(volSlider.value, 10);
-    volLabel.textContent = v + "%";
-    if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(v);
-    volSlider.style.background =
-      `linear-gradient(90deg, var(--accent-2) 0%, var(--accent-2) ${v}%, rgba(255,255,255,.1) ${v}%)`;
+  dom.btnReload.addEventListener('click', () => {
+    const id = parseYouTubeId(dom.url.value);
+    if (!id) return toast('لا يوجد فيديو للتحميل', 'warn');
+    loadVideo(id);
+    toast('إعادة التحميل…', 'info', 1200);
   });
 
-  /* ---------- SPEED ---------- */
-  speedRow.addEventListener("click", (e) => {
-    const btn = e.target.closest(".speed-btn");
+  /* ---------- Volume ---------- */
+  function setVolume(v) {
+    v = Math.max(0, Math.min(100, v));
+    dom.vol.value = v;
+    dom.volValue.textContent = v;
+    dom.vol.style.setProperty('--p', v + '%');
+    if (state.player && state.player.setVolume) state.player.setVolume(v);
+  }
+  dom.vol.addEventListener('input', () => setVolume(+dom.vol.value));
+  setVolume(100);
+
+  /* ---------- Speed ---------- */
+  dom.speeds.addEventListener('click', ev => {
+    const btn = ev.target.closest('.speed');
     if (!btn) return;
-    currentSpeed = parseFloat(btn.dataset.speed);
-    speedRow.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    if (ytPlayer && ytPlayer.setPlaybackRate) {
-      ytPlayer.setPlaybackRate(currentSpeed);
-      toast(`⚡ السرعة: ${currentSpeed}x`, "info", 1500);
-    }
+    const sp = parseFloat(btn.dataset.speed);
+    state.speed = sp;
+    $$('.speed', dom.speeds).forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    if (state.player && state.player.setPlaybackRate) state.player.setPlaybackRate(sp);
+    toast(`السرعة ${sp}x`, 'info', 1200);
   });
 
-  /* ---------- LOAD / CLEAR / RANDOM ---------- */
-  loadVideoBtn.addEventListener("click", () => {
-    const id = getYouTubeVideoID(videoUrlInput.value.trim());
-    if (id) {
-      loadVideo(id);
-    } else {
-      Swal.fire({
-        title: "رابط غير صالح",
-        text: "الرجاء إدخال رابط يوتيوب صحيح",
-        icon: "warning",
-        confirmButtonColor: "#6a5acd"
-      });
-    }
+  /* ---------- URL flow ---------- */
+  function tryLoadFromField() {
+    const id = validateField();
+    if (id) loadVideo(id);
+    else Swal.fire({
+      title: 'رابط غير صالح',
+      text: 'تأكد من إدخال رابط يوتيوب صحيح',
+      icon: 'warning',
+      background: '#14181f',
+      color: '#e6e9ef',
+      confirmButtonColor: '#e8a13a'
+    });
+  }
+
+  dom.url.addEventListener('input', validateField);
+  dom.url.addEventListener('keydown', e => { if (e.key === 'Enter') tryLoadFromField(); });
+  dom.load.addEventListener('click', tryLoadFromField);
+
+  dom.fieldClear.addEventListener('click', () => {
+    dom.url.value = '';
+    validateField();
+    dom.url.focus();
   });
 
-  videoUrlInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") loadVideoBtn.click();
+  /* ---------- Reset ---------- */
+  dom.reset.addEventListener('click', () => {
+    dom.url.value = '';
+    validateField();
+    if (state.player && state.player.stopVideo) state.player.stopVideo();
+    dom.empty.hidden = false;
+    setControlsEnabled(false);
+    dom.tState.textContent = '—';
+    dom.tCur.textContent = '00:00';
+    dom.tRem.textContent = '00:00';
+    dom.tTot.textContent = '00:00';
+    dom.seekFill.style.width = '0%';
+    toast('تم المسح', 'info', 1200);
   });
 
-  clearBtn.addEventListener("click", () => {
-    videoUrlInput.value = "";
-    checkUrlInput();
-    if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
-    placeholder.classList.remove("hide");
-    statusTextEl.textContent = "—";
-    currentTimeEl.textContent = "00:00";
-    remainingTimeEl.textContent = "00:00";
-    totalTimeEl.textContent = "00:00";
-    progressFill.style.width = "0%";
-    [playPauseBtn, stopBtn, muteBtn, fullscreenBtn, loopBtn,
-     reloadBtn, back10Btn, fwd10Btn, pipBtn, theaterBtn].forEach(b => b.disabled = true);
-    toast("تم المسح", "info", 1500);
-  });
-
-  const RANDOM_IDS = [
-    "dQw4w9WgXcQ","UabdF7qqDBw","9bZkp7q19f0","kJQP7kiw5Fk",
-    "3JZ_D3ELwOQ","OPf0YbXqDm0","RgKAFK5djSk","60ItHLz5WEA",
-    "fRh_vgS2dFE","CevxZvSJLk8","JGwWNGJdvx8","hT_nvWreIhg"
+  /* ---------- Random ---------- */
+  const POOL = [
+    'dQw4w9WgXcQ','9bZkp7q19f0','kJQP7kiw5Fk','3JZ_D3ELwOQ',
+    'OPf0YbXqDm0','RgKAFK5djSk','60ItHLz5WEA','fRh_vgS2dFE',
+    'CevxZvSJLk8','JGwWNGJdvx8','hT_nvWreIhg','UabdF7qqDBw'
   ];
-  randomBtn.addEventListener("click", () => {
-    const id = RANDOM_IDS[Math.floor(Math.random() * RANDOM_IDS.length)];
-    videoUrlInput.value = "https://www.youtube.com/watch?v=" + id;
-    checkUrlInput();
+  dom.random.addEventListener('click', () => {
+    const id = POOL[(Math.random() * POOL.length) | 0];
+    dom.url.value = `https://youtu.be/${id}`;
+    validateField();
     loadVideo(id);
   });
 
-  /* ---------- KEYBOARD SHORTCUTS ---------- */
-  document.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-    if (!ytPlayer || !ytPlayer.getPlayerState) return;
-    switch (e.key) {
-      case " ":
-        e.preventDefault();
-        isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
-        break;
-      case "ArrowRight":
-        ytPlayer.seekTo((ytPlayer.getCurrentTime() || 0) + 5, true); break;
-      case "ArrowLeft":
-        ytPlayer.seekTo(Math.max(0, (ytPlayer.getCurrentTime() || 0) - 5), true); break;
-      case "ArrowUp":
-        e.preventDefault();
-        volSlider.value = Math.min(100, parseInt(volSlider.value) + 10);
-        volSlider.dispatchEvent(new Event("input")); break;
-      case "ArrowDown":
-        e.preventDefault();
-        volSlider.value = Math.max(0, parseInt(volSlider.value) - 10);
-        volSlider.dispatchEvent(new Event("input")); break;
-      case "m": case "M": muteBtn.click(); break;
-      case "f": case "F": fullscreenBtn.click(); break;
-      case "l": case "L": loopBtn.click(); break;
+  /* ---------- Keyboard ---------- */
+  document.addEventListener('keydown', e => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+    if (!state.player || !state.player.getPlayerState) return;
+
+    const k = e.key;
+    if (k === ' ' || k === 'Spacebar') {
+      e.preventDefault();
+      state.playing ? state.player.pauseVideo() : state.player.playVideo();
+    } else if (k === 'ArrowRight') {
+      state.player.seekTo(state.player.getCurrentTime() + 5, true);
+    } else if (k === 'ArrowLeft') {
+      state.player.seekTo(Math.max(0, state.player.getCurrentTime() - 5), true);
+    } else if (k === 'ArrowUp') {
+      e.preventDefault(); setVolume(+dom.vol.value + 10);
+    } else if (k === 'ArrowDown') {
+      e.preventDefault(); setVolume(+dom.vol.value - 10);
+    } else if (k === 'm' || k === 'M') {
+      dom.btnMute.click();
+    } else if (k === 'f' || k === 'F') {
+      dom.btnFull.click();
+    } else if (k === 'l' || k === 'L') {
+      dom.btnLoop.click();
+    } else if (k === 'k' || k === 'K') {
+      dom.btnPlay.click();
     }
   });
 
-  /* ---------- INIT FOCUS ---------- */
-  setTimeout(() => videoUrlInput.focus(), 200);
+  /* ---------- Focus on start ---------- */
+  setTimeout(() => dom.url.focus(), 180);
 
-  /* ---------- EXPOSE YT CALLBACK ---------- */
-  window.onYouTubeIframeAPIReady = () => {
-    console.log("✅ YouTube IFrame API Ready");
-  };
-
-  /* ---------- DOWNLOAD SHORTCUT ---------- */
-  window.Download = () => {
-    Swal.fire({
-      title: "تحميل الفيديو",
-      text: "هذه الميزة تتطلب خادم خلفي (Backend) — الرابط غير متاح مباشرة من المتصفح.",
-      icon: "info",
-      confirmButtonColor: "#6a5acd"
-    });
-  };
+  /* ---------- Kill interval on unload ---------- */
+  window.addEventListener('beforeunload', () => clearInterval(state.tick));
 })();
 </script>
 
 </body>
-															</html>
+</html>
