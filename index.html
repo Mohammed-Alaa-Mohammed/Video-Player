@@ -1,675 +1,1083 @@
 <!DOCTYPE html>
-<!--
-<script>
-alert("Checking Internet after Start...")
-</script>
--->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<html lang="en">
-<script>document.getElementById("videoUrl").focus();</script>
+<html lang="en" dir="ltr">
 <head>
-    <link rel="icon" href="https://cdn.icon-icons.com/icons2/159/PNG/256/multimedia_video_player_22460.png">
-    <meta charset="UTF-8">
-    <meta name="generator" content="Visual Studio Code 1.82.0"> 
-     <meta name="googlebot" content="index, follow"> 
-    <meta name="keywords" content="YouTube,youtube,video,videos,VIDEOS,Videos,vid,media,content,فيديوهات ,مشغل فيديوهات"> 
-    <meta content="author" content="Mohammed Alaa Mohammed">
-        
-        <link rel="icon" href="https://www.freepik.com/icon/play_16555997#fromView=keyword&page=1&position=19&uuid=00edbd5d-e039-410d-94fe-707394cec58b">
-    
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom YouTube Video Player | Mohammed Alaa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #222;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            height: auto;
-            padding-color:#fbfca5;
-            transform : none;
-            
-        }
-        .container {
-            padding: 15px;
-            
-        }
-        .video-container {
-            margin-top: 40px;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-        }
-    								#videoUrl:hover{
-    								    border:5px groove #2e2e2e;
-    								    border:none;
-    								    background-color : #ddd;
-    								    
-    								}
-        .video-url-input {
-            margin-top: 20px;
-            text-align: center;
-            
-        }
-       #videoUrl:is(:focus){
-        color:#fff;
-        border: 2px solid transparent;
-        transition: all 0.1s esse;
-        background: linear-gradient(#1f1f1f , #121125)
-        padding-box,linear-gradient(45deg,#d765AD,#55b9e2) border-box;
-           box-shadow: 0 4px 150px 5px #fff;
-    }
-        .video-url-input input {
-            padding: 10px;
-            width: 100%;
-            max-width: 500px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-            border:none;
-            color:#2e2e2e;
-            font-weight:bold;
-            outline:none;
-            
-        }
-        .video-url-input button {
-            padding: 10px;
-            background: #344eac;
-            border: none;
-            border-radius: 4px;
-            color: #fff;
-            cursor: pointer;
-            margin-top: 5px;
-            margin-left:30px;
-        }
-        .video-url-input button:hover {
-            background: #0056b3;
-            margin-left:30px;
-        }
-        #player {
-            width: 100%;
-            height: 100%;
-            max-height: 500px;
-            border: none;
-            display:flex;
-            
-        }
-       .controls {
-           height:100%;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Visual Studio Code 1.92.0">
+<meta name="googlebot" content="index, follow">
+<meta name="keywords" content="YouTube, video player, videos, media, مشغل فيديوهات, فيديوهات">
+<meta name="author" content="Mohammed Alaa Mohammed">
+<meta name="description" content="Advanced Custom YouTube Video Player with modern UI and pro features.">
+<title>🎬 YouTube Player Pro | Mohammed Alaa</title>
+
+<!-- Favicon -->
+<link rel="icon" href="https://cdn.icon-icons.com/icons2/159/PNG/256/multimedia_video_player_22460.png">
+
+<!-- Bootstrap & Font Awesome -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  /* ================== ROOT & RESET ================== */
+  :root {
+    --bg-1: #0a0a12;
+    --bg-2: #12121f;
+    --bg-3: #1a1a2e;
+    --accent-1: #6a5acd;
+    --accent-2: #00d4ff;
+    --accent-3: #ff3d81;
+    --text: #eaeaf0;
+    --text-dim: #9a9ab0;
+    --success: #00c896;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-brd: rgba(255, 255, 255, 0.12);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    min-height: 100vh;
+    background: radial-gradient(1200px 600px at 10% -10%, #1c1c35 0%, transparent 60%),
+                radial-gradient(1000px 600px at 100% 0%, #14273a 0%, transparent 55%),
+                linear-gradient(180deg, var(--bg-1), var(--bg-2) 60%, #0c0c17);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
+    overflow-x: hidden;
+    padding-bottom: 90px;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(circle at 50% 30%, #000 40%, transparent 90%);
+  }
+
+  /* Floating blobs */
+  .blob {
+    position: fixed;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    filter: blur(110px);
+    opacity: .35;
+    z-index: 0;
+    pointer-events: none;
+    animation: float 12s ease-in-out infinite;
+  }
+  .blob.b1 { background: var(--accent-1); top: -120px; left: -120px; }
+  .blob.b2 { background: var(--accent-2); bottom: -140px; right: -140px; animation-delay: -4s; }
+  .blob.b3 { background: var(--accent-3); top: 40%; left: 45%; width: 260px; height: 260px; opacity:.18; animation-delay: -8s; }
+  @keyframes float {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(40px,-30px) scale(1.12); }
+  }
+
+  .container-app {
+    position: relative;
+    z-index: 1;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 28px 18px 40px;
+  }
+
+  /* ================== HEADER ================== */
+  .app-header {
     display: flex;
-    flex-wrap: wrap; /* السماح بتوزيع الأزرار في عدة صفوف */
-    justify-content: space-between; /* توزيع الأزرار بالتساوي */
-    padding: 20px;
-    background: #444;
-    border-radius: 8px;
-    margin-top: 15px;
-    width: 105%;
-    box-sizing: border-box;
-    max-width: 1270px; /* أقصى عرض للحاوية */
-    margin-left: -8px;
-    margin-right: auto;
-}
-
-/* تنسيق الأزرار */
-.controls button {
-    background-color: #555;
-    border: none;
-    padding: 12px 25px; /* حشو مريح مع حجم مناسب */
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    text-align: center;
-    font-size: 16px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: calc(50% - 10px); /* تحديد عرض الزر ليكون 50% مع مسافة بين الأزرار */
-    height: 60px; /* تحديد ارتفاع الأزرار */
-    margin-bottom: 15px; /* مسافة بين الأزرار في الأسطر المختلفة */
-    box-sizing: border-box;
-}
-
-/* تأثير hover للأزرار */
-.controls button:hover {
-    background-color: #777;
-    transform: scale(1.09);
-}
-
-/* تخصيص زر إعادة التحميل */
-#reloadBtn {
-    margin-left:8px;
-    width:158px;
-    background-color: #28a745;
-    border: none;
-    
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-/* تأثير hover لزر إعادة التحميل */
-#reloadBtn:hover {
-    background-color: #218838;
-    transform: scale(1.05);
-}
-    
-
-.video-time {
-    display: flex;
+    align-items: center;
     justify-content: space-between;
-    margin-top: 20px;
-    color: #ddd;
-    font-size: 16px;
-}
-        footer {
-            background-color: #222;
-            color: #888;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            
-        }
-        footer p {
-            margin: 0;
-        }
-    
-    
-        /* إضافة تصميم احترافي للعنصر select */
-/* تصميم الـ select */
-#speedSelect {
-  width: 160px; /* عرض القائمة */
-  height: 35px; /* ارتفاع القائمة */
-  background-color: #f9f9f9; /* لون الخلفية */
-  border: 2px solid #0078d4; /* لون الحدود */
-  border-radius: 6px; /* الزوايا الدائرية */
-  font-size: 14px; /* حجم النص */
-  color: #333; /* لون النص */
-  padding: 5px; /* مسافة داخلية */
-  outline: none; /* إزالة الخط الخارجي */
-  cursor: pointer; /* تغيير مؤشر الفأرة */
-  transition: all 0.3s ease; /* تأثير الانتقال */
-    margin-left:-335px;
-    margin-top:-5px;
-}
+    gap: 16px;
+    padding: 14px 20px;
+    margin-bottom: 22px;
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: var(--radius);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .brand .logo {
+    width: 46px; height: 46px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    box-shadow: 0 6px 22px rgba(106,90,205,.45);
+    font-size: 22px; color: #fff;
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+  @keyframes pulseGlow {
+    0%,100% { box-shadow: 0 6px 22px rgba(106,90,205,.45); }
+    50%     { box-shadow: 0 6px 34px rgba(0,212,255,.65); }
+  }
+  .brand h1 {
+    font-size: 19px; font-weight: 800; letter-spacing: .3px;
+    background: linear-gradient(90deg, #fff, var(--accent-2));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  .brand p { font-size: 12px; color: var(--text-dim); }
 
-/* تأثير عند التمرير */
-#speedSelect:hover {
-  background-color: #e8f4fc; /* لون خلفية مختلف */
-  border-color: #005bb5; /* لون الحدود عند التمرير */
-}
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; padding: 7px 13px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--glass-brd);
+    border-radius: 999px;
+    color: var(--text-dim);
+  }
+  .chip .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 10px var(--success);
+    animation: blink 1.6s infinite;
+  }
+  @keyframes blink { 50% { opacity: .35; } }
 
-/* تنسيق الخيارات داخل القائمة */
-#speedSelect option {
-  padding: 5px; /* مسافة داخلية للخيار */
-  background-color: #ffffff; /* لون خلفية الخيارات */
-  color: #333; /* لون النص للخيارات */
-}
-    #setlink {
-    display: flex; /* لجعل الأيقونة والنص بجانب بعضهما */
-    align-items: center; /* محاذاة العناصر عموديًا */
-    background-color: #900; /* لون الخلفية */
-    color: white; /* لون النص */
-    border: none; /* إزالة الحدود */
-    border-radius: 5px; /* حواف دائرية */
-    padding: 10px -20px; /* مساحة داخلية */
-    font-size: 16px; /* حجم النص */
-    margin-left:120px;    
-    margin-top:15px;    
-    cursor: pointer; /* إظهار مؤشر اليد */
-    transition: background-color 0.3s ease; /* تأثير التغيير عند التحويم */
-        
-}
-    
-    #setlink i {
-    margin-right: 8px; /* مسافة بين الأيقونة والنص */
-    font-size: 18px; /* حجم الأيقونة */
-    color : #FFFCFF;    
-    }
-        
+  /* ================== URL BAR ================== */
+  .url-bar {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    align-items: center;
+    padding: 18px;
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: var(--radius);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+  }
+  .input-wrap {
+    position: relative;
+    flex: 1 1 380px;
+    min-width: 240px;
+  }
+  .input-wrap i.lead-icon {
+    position: absolute; left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+  #videoUrl {
+    width: 100%;
+    padding: 14px 44px 14px 42px;
+    background: rgba(0,0,0,.35);
+    border: 1.5px solid var(--glass-brd);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    transition: all .25s ease;
+  }
+  #videoUrl::placeholder { color: #6b6b85; }
+  #videoUrl:focus {
+    border-color: transparent;
+    background:
+      linear-gradient(rgba(15,15,25,.95), rgba(15,15,25,.95)) padding-box,
+      linear-gradient(135deg, var(--accent-2), var(--accent-3)) border-box;
+    border: 1.5px solid transparent;
+    box-shadow: 0 0 0 4px rgba(0,212,255,.12), 0 0 30px rgba(0,212,255,.25);
+  }
+  #videoUrl.valid { border-color: var(--success); box-shadow: 0 0 0 4px rgba(0,200,150,.12); }
+  #videoUrl.invalid { border-color: var(--danger); box-shadow: 0 0 0 4px rgba(255,71,87,.15); }
+  .input-wrap .clear-x {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: transparent; border: none;
+    color: var(--text-dim); cursor: pointer;
+    font-size: 15px; display: none;
+    padding: 4px;
+  }
+  .input-wrap .clear-x:hover { color: var(--danger); }
 
-#setlink:hover , .i {
-    background-color: #00A341; /* لون عند التحويم */
-    
-}
+  /* ================== BUTTONS ================== */
+  .btn-pro {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    padding: 13px 22px;
+    font-size: 14.5px; font-weight: 700;
+    border: none; border-radius: 10px;
+    color: #fff; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    box-shadow: 0 6px 20px rgba(106,90,205,.35);
+    transition: all .28s cubic-bezier(.2,.8,.2,1);
+    position: relative; overflow: hidden;
+    white-space: nowrap;
+  }
+  .btn-pro::after {
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform .6s;
+  }
+  .btn-pro:hover::after { transform: translateX(100%); }
+  .btn-pro:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 30px rgba(106,90,205,.5); }
+  .btn-pro:active { transform: translateY(0) scale(.98); }
 
-#setlink:active {
-    background-color: #003d80; /* لون عند الضغط */
-}
-    #btn-dm {
-        background-color:#4c4455;
-        color :#CDD;
-        margin-left:12px;
-        width:190px;
-        height:45px;
-        padding:50 auto;
-        transform:translateY(8px);
-        cursor:pointer;
-        border:#fff groove 1px;
-        border-radius: 5px 5px  20px 20px;
-        border-color: #00eeee;
-        font-weight:bold;
-        transition:all 0.7s;
-        algin-content:left;
-        box-shadow: 0 0px 500px 15px #AAAAbd;
-        opacity:.9;
-    }
-    
-    #btn-dm:hover{
-        top:-30px;
-        left:-30px;
-        background-color:transparent;
-        text-color:transparent;
-        border-radius: 50px;
-        box-shadow: -15px -5px 200px 15px #0fffff;
-        opacity:.8;
-        padding: 10px 15px;
-        background-color:#2e2e2e;
-        display: inline-block;
-        transform: translateY(30px);
-        transition:.5;
-        algin-content:left;
-        box-sizing:border-box;
-        inset:50px;
-        transform:scale(-6px);
-    }
-    
-    #btn-dm:hover::before{
-        width:105%;
-        color:#ff;
-    }
-    
-        
-    #i-dm:hover{
-        box-shadow: 0 0 50px 10px #2e2e2e;
-        color:#0fffff;
-        
-        opacity:1;
-    }
-    
-    form{
-        border: 5px solid #222;
-        background:#888;
-    }
-    
-    #text , #pass{
-        all : unset;
-        align-content:center;
-        border-radius:5px;
-        border: 2px groove #2e2e2e;
-        width:230px;
-        height:15px;
-        color:#3e3e3e;
-        background-color:#222;
-        transform:translateX(50px);
-        background-color:#ccc;
-        text-align: center;
-        display:flex;
-        margin:5px;
-        font-size:13px;
-        font-weight:bold;
-        padding: 10px 20px;
-    }
-    #pass:is(:focus){
-        color:#fff;
-        border: 2px solid transparent;
-        transition: all 0.1s esse;
-        background: linear-gradient(#121125 , #121125)
-        padding-box,linear-gradient(45deg,blue,red) border-box;
-    }
-    
-    #text:is(:focus){
-        color:#fff;
-        border: 2px solid transparent;
-        transition: all 0.1s esse;
-        background: linear-gradient(#121125 , #121125)
-        padding-box,linear-gradient(45deg,blue,red) border-box;
-    }
-    
-    
-    
-    #btn-send{
-        color:#bbb;
-        width:170px;
-        background-color:#444;
-        transform:translateX(60%);
-        padding:5px;
-        margin-top:8px;
-        border:2px groove #0fffff;
-        border-radius:5px;
-        box-shadow: 8px 15px 90px 10px #FFF;
-        font-size:15px;
-        font-weight:bold;
-        outline:none;
-        
-        
-    }
-    #btn-send:hover{
-        box-shadow: 0 0 90px 8px #0fffff;
-        border-radius:30px;
-        transition: all 0.2s ease; /* تأثير الانتقال */
-        opacity:1;
-        color:#0fffff;
-        background:linear-gradient(#121125 , #121125)
-        padding-box,linear-gradient(45deg,blue,red) border-box;
-    }
-    #icon-btn{
-        box-shadow: 0 0 8px 10px #222;
-        color:#0fff;
-    }
-    
-    </style>
+  .btn-ghost {
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--glass-brd);
+    box-shadow: none;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,.1); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+
+  .btn-danger { background: linear-gradient(135deg, #ff4757, #c0392b); box-shadow: 0 6px 20px rgba(255,71,87,.35); }
+  .btn-success { background: linear-gradient(135deg, var(--success), #009e75); box-shadow: 0 6px 20px rgba(0,200,150,.35); }
+  .btn-warn { background: linear-gradient(135deg, var(--warn), #e67e22); box-shadow: 0 6px 20px rgba(255,165,2,.35); }
+
+  /* ================== VIDEO AREA ================== */
+  .player-wrap {
+    position: relative;
+    background: #000;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 18px 60px rgba(0,0,0,.75), 0 0 0 1px var(--glass-brd);
+    aspect-ratio: 16/9;
+    margin-bottom: 14px;
+  }
+  #player, #player iframe { width: 100%; height: 100%; border: none; display: block; }
+
+  .placeholder {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    text-align: center;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(106,90,205,.15), transparent 60%),
+      #0b0b14;
+    z-index: 2;
+    transition: opacity .4s;
+  }
+  .placeholder.hide { opacity: 0; pointer-events: none; }
+  .placeholder i {
+    font-size: 68px;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    animation: bounce 2.4s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-12px); }
+  }
+  .placeholder h2 { font-size: 20px; margin-top: 14px; font-weight: 700; }
+  .placeholder p { color: var(--text-dim); font-size: 13.5px; margin-top: 6px; }
+
+  /* Progress bar overlay */
+  .progress-strip {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 4px; background: rgba(255,255,255,.08);
+    z-index: 3; cursor: pointer;
+  }
+  .progress-strip .fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    box-shadow: 0 0 12px var(--accent-2);
+    transition: width .2s linear;
+  }
+
+  /* Loading spinner overlay */
+  .loader {
+    position: absolute; inset: 0;
+    display: none; place-items: center;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(3px);
+    z-index: 4;
+  }
+  .loader.show { display: grid; }
+  .spinner {
+    width: 54px; height: 54px;
+    border: 4px solid rgba(255,255,255,.15);
+    border-top-color: var(--accent-2);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ================== INFO ROW ================== */
+  .info-row {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .info-card {
+    flex: 1 1 180px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    min-width: 0;
+  }
+  .info-card .ic {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(106,90,205,.4), rgba(0,212,255,.25));
+    font-size: 16px; color: #fff;
+    flex-shrink: 0;
+  }
+  .info-card .meta { min-width: 0; }
+  .info-card .lbl { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; }
+  .info-card .val { font-size: 15px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+
+  /* ================== CONTROLS ================== */
+  .controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    padding: 16px;
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: var(--radius);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  .ctrl-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 10px;
+    font-size: 13.5px; font-weight: 600;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--glass-brd);
+    border-radius: 10px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .22s ease;
+    white-space: nowrap;
+    min-height: 46px;
+  }
+  .ctrl-btn i { font-size: 14px; color: var(--accent-2); transition: .22s; }
+  .ctrl-btn:hover {
+    background: rgba(106,90,205,.18);
+    border-color: rgba(106,90,205,.6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(106,90,205,.3);
+  }
+  .ctrl-btn:hover i { color: #fff; transform: scale(1.15); }
+  .ctrl-btn:active { transform: translateY(0) scale(.97); }
+  .ctrl-btn.active {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    border-color: transparent;
+    box-shadow: 0 6px 20px rgba(106,90,205,.5);
+  }
+  .ctrl-btn.active i { color: #fff; }
+  .ctrl-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* ================== SPEED & VOLUME PANELS ================== */
+  .panel-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .panel {
+    padding: 16px;
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: var(--radius);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+  }
+  .panel h3 {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .8px;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel h3 i { color: var(--accent-2); }
+
+  .speed-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .speed-btn {
+    flex: 1 0 auto;
+    padding: 9px 12px;
+    font-size: 13px; font-weight: 700;
+    background: rgba(0,0,0,.3);
+    border: 1px solid var(--glass-brd);
+    border-radius: 8px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: .2s;
+  }
+  .speed-btn:hover { color: #fff; border-color: var(--accent-2); }
+  .speed-btn.active {
+    background: linear-gradient(135deg, var(--accent-2), var(--accent-1));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 14px rgba(0,212,255,.4);
+  }
+
+  /* Volume slider */
+  .vol-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 6px;
+    background: linear-gradient(90deg, var(--accent-2) 0%, var(--accent-2) 70%, rgba(255,255,255,.1) 70%);
+    border-radius: 999px;
+    outline: none; cursor: pointer;
+    margin-top: 6px;
+  }
+  .vol-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 12px var(--accent-2);
+    cursor: pointer;
+    transition: .2s;
+  }
+  .vol-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  .vol-slider::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; border: none;
+    box-shadow: 0 0 12px var(--accent-2);
+    cursor: pointer;
+  }
+
+  /* ================== FOOTER ================== */
+  footer.app-footer {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    background: rgba(10,10,18,.75);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-brd);
+    z-index: 10;
+  }
+  footer.app-footer strong { color: var(--accent-2); }
+
+  /* ================== TOAST ================== */
+  .toast-pro {
+    position: fixed; top: 20px; right: 20px;
+    padding: 14px 18px;
+    background: rgba(20,20,35,.95);
+    border: 1px solid var(--glass-brd);
+    border-left: 4px solid var(--accent-2);
+    border-radius: 10px;
+    color: #fff; font-size: 13.5px;
+    box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 10px;
+    transform: translateX(140%);
+    transition: transform .45s cubic-bezier(.2,.8,.2,1);
+    z-index: 9999;
+    max-width: 340px;
+  }
+  .toast-pro.show { transform: translateX(0); }
+  .toast-pro.success { border-left-color: var(--success); }
+  .toast-pro.error { border-left-color: var(--danger); }
+  .toast-pro.warn { border-left-color: var(--warn); }
+
+  /* Shortcut hint */
+  kbd {
+    background: rgba(255,255,255,.1);
+    border: 1px solid var(--glass-brd);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--accent-2);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #0d0d17; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--accent-1), var(--accent-2));
+    border-radius: 999px;
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .app-header { flex-direction: column; align-items: stretch; }
+    .header-actions { justify-content: center; }
+    .brand h1 { font-size: 16px; }
+    .btn-pro { padding: 11px 16px; font-size: 13px; }
+    .ctrl-btn { font-size: 12px; min-height: 42px; }
+  }
+</style>
 </head>
 <body>
-  
-    
-    <div class="container">
-        <div class="video-url-input">
-            <input type="text" id="videoUrl" placeholder="Enter YouTube Video URL : " onkeyup="checkUrlInput()">
-            <button id="loadVideoBtn"
-                style="width:150px;
-                margin-top:15px;
-                margin-left:auto; "
-                ><i class="fas fa-play-circle"></i> Load Video</button>
-            <button id="clearBtn"
-                style="width:150px;
-                margin-top:15px;
-                margin-left:30px;"
-                ><i class="fas fa-times-circle"></i> Clear URL</button>
-            <br>
-              <button id="setlink" class="button-link"
-                  onclick="setValue()"
-                  ><i
-                  style=""
-                  class="fa-solid fa-cubes"></i></i>Random Link</button>
-        <button onclick="Download(");" class="btn-down" id="btn-dm">
-            <i  class="fas fa-rocket" id="i-dm"></i>
-            Download Video
-        </button>
-        </div>
 
-        <div class="video-container">
-            <div id="player"></div>
-        </div>
-        <!--وقت الفيديو-->
- <div class="video-time">
-            <span id="currentTime">00:00</span>
-            <span id="remainingTime">00:00</span>
-        </div>
-        
-        
-        
-       <div class="controls" style="padding-bottom:50px; border-radius: 5px;">
-    <button id="playPauseBtn"><i class="fas fa-play"></i> Play/Pause</button>
-    <button id="volumeUpBtn"><i class="fas fa-volume-up"></i> Volume Up</button>
-    <button id="volumeDownBtn"><i class="fas fa-volume-down"></i> Volume Down</button>
-    <button id="muteBtn"><i class="fas fa-volume-mute"></i> Mute</button>
-    <button id="fullscreenBtn"><i class="fas fa-expand"></i> Fullscreen</button>
-    <button id="stopBtn"><i class="fas fa-stop"></i> Stop</button>
-    <button id="loopBtn"><i class="fas fa-redo"></i> Loop</button>
-    <!-- New Reload Button -->
-    <button id="reloadBtn"><i class="fas fa-sync-alt"></i> Reload Player</button>
-           
-           
-           <!-- New Elementes-->
-           
-           <div style="display: flex; align-items: center; justify-content: flex-end;">
-  <b dir="rtl" style="margin-left: 190px; border:outset#fdfdcc 4px; background-color:#000; padding:4px;">تحديد سرعة الفيديو :&#xbb;</b>
-  <select id="speedSelect" class="sec">
-    <option value="1">1x</option>
-    <option value="1.5">1.5x</option>
-    <option value="2">2x</option>
-  </select>
-           </div>
-       </div>
+<!-- Background blobs -->
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+
+<div class="container-app">
+
+  <!-- ============ HEADER ============ -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo"><i class="fas fa-play"></i></div>
+      <div>
+        <h1>YouTube Player Pro</h1>
+        <p>مشغل فيديوهات احترافي • Mohammed Alaa</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="chip"><span class="dot"></span> API Ready</span>
+      <span class="chip"><i class="fas fa-bolt" style="color:#ffa502"></i> v4.0</span>
+    </div>
+  </header>
+
+  <!-- ============ URL INPUT ============ -->
+  <div class="url-bar">
+    <div class="input-wrap">
+      <i class="fas fa-link lead-icon"></i>
+      <input type="text" id="videoUrl" placeholder="الصق رابط يوتيوب هنا... (youtube.com/watch أو youtu.be)" autocomplete="off" spellcheck="false">
+      <button class="clear-x" id="clearX" title="مسح"><i class="fas fa-times-circle"></i></button>
+    </div>
+    <button class="btn-pro" id="loadVideoBtn"><i class="fas fa-play-circle"></i> تشغيل الفيديو</button>
+    <button class="btn-pro btn-ghost" id="randomBtn" title="رابط عشوائي"><i class="fas fa-dice"></i> عشوائي</button>
+    <button class="btn-pro btn-danger" id="clearBtn"><i class="fas fa-eraser"></i> مسح</button>
+  </div>
+
+  <!-- ============ VIDEO PLAYER ============ -->
+  <div class="player-wrap" id="playerWrap">
+    <div class="placeholder" id="placeholder">
+      <div>
+        <i class="fas fa-film"></i>
+        <h2>جاهز للتشغيل</h2>
+        <p>الصق رابط الفيديو أو اضغط "عشوائي" للبدء</p>
+      </div>
+    </div>
+    <div class="loader" id="loader"><div class="spinner"></div></div>
+    <div id="player"></div>
+    <div class="progress-strip" id="progressStrip"><div class="fill" id="progressFill"></div></div>
+  </div>
+
+  <!-- ============ INFO ROW ============ -->
+  <div class="info-row">
+    <div class="info-card">
+      <div class="ic"><i class="fas fa-clock"></i></div>
+      <div class="meta">
+        <div class="lbl">Current Time</div>
+        <div class="val" id="currentTime">00:00</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="ic"><i class="fas fa-hourglass-half"></i></div>
+      <div class="meta">
+        <div class="lbl">Remaining</div>
+        <div class="val" id="remainingTime">00:00</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="ic"><i class="fas fa-hourglass-end"></i></div>
+      <div class="meta">
+        <div class="lbl">Duration</div>
+        <div class="val" id="totalTime">00:00</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="ic"><i class="fas fa-signal"></i></div>
+      <div class="meta">
+        <div class="lbl">Status</div>
+        <div class="val" id="statusText">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONTROL BUTTONS ============ -->
+  <div class="controls-grid">
+    <button class="ctrl-btn" id="playPauseBtn" disabled><i class="fas fa-play"></i> تشغيل</button>
+    <button class="ctrl-btn" id="stopBtn" disabled><i class="fas fa-stop"></i> إيقاف</button>
+    <button class="ctrl-btn" id="muteBtn" disabled><i class="fas fa-volume-mute"></i> كتم</button>
+    <button class="ctrl-btn" id="fullscreenBtn" disabled><i class="fas fa-expand"></i> ملء الشاشة</button>
+    <button class="ctrl-btn" id="loopBtn" disabled><i class="fas fa-redo"></i> تكرار</button>
+    <button class="ctrl-btn" id="reloadBtn" disabled><i class="fas fa-sync-alt"></i> إعادة</button>
+    <button class="ctrl-btn" id="back10Btn" disabled><i class="fas fa-undo"></i> -10s</button>
+    <button class="ctrl-btn" id="fwd10Btn" disabled><i class="fas fa-redo-alt"></i> +10s</button>
+    <button class="ctrl-btn" id="pipBtn" disabled><i class="fas fa-clone"></i> PiP</button>
+    <button class="ctrl-btn" id="theaterBtn" disabled><i class="fas fa-tv"></i> Theater</button>
+  </div>
+
+  <!-- ============ SPEED & VOLUME ============ -->
+  <div class="panel-row">
+    <div class="panel">
+      <h3><i class="fas fa-tachometer-alt"></i> سرعة التشغيل</h3>
+      <div class="speed-row" id="speedRow">
+        <button class="speed-btn" data-speed="0.25">0.25x</button>
+        <button class="speed-btn" data-speed="0.5">0.5x</button>
+        <button class="speed-btn" data-speed="0.75">0.75x</button>
+        <button class="speed-btn active" data-speed="1">1x</button>
+        <button class="speed-btn" data-speed="1.25">1.25x</button>
+        <button class="speed-btn" data-speed="1.5">1.5x</button>
+        <button class="speed-btn" data-speed="2">2x</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3><i class="fas fa-volume-up"></i> مستوى الصوت <span id="volLabel" style="color:var(--accent-2);margin-left:auto">100%</span></h3>
+      <input type="range" min="0" max="100" value="100" class="vol-slider" id="volSlider">
+    </div>
+
+    <div class="panel">
+      <h3><i class="fas fa-keyboard"></i> اختصارات لوحة المفاتيح</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--text-dim)">
+        <span><kbd>Space</kbd> تشغيل/إيقاف</span>
+        <span><kbd>←</kbd>/<kbd>→</kbd> ±5s</span>
+        <span><kbd>↑</kbd>/<kbd>↓</kbd> الصوت</span>
+        <span><kbd>M</kbd> كتم</span>
+        <span><kbd>F</kbd> ملء الشاشة</span>
+        <span><kbd>L</kbd> تكرار</span>
+      </div>
+    </div>
+  </div>
+
 </div>
-<!--
-<hr>
-<form style="background-color:#fff;">
-<div style="padding-top:-3px; padding-bottom:55px; display:center; padding-left:15px; background-color:#222;">
-    <label> Email : 
-    <input type="text" id="text" required placeholder="Enter Your Email Name : ">
-    </label>
-    <label>Password : 
-    <input type="password" id="pass" required placeholder="Enter Your Password of Email : ">
-    </label>
-    <br>
-    <input type="submit" id="btn-send" value="Send Message"><i id="icon-btn" class="fas fa-user"></i>
-</form>    
-</div>
--->
 
-    <footer>
-        <p>&copy; 2024 Mohammed Alaa. All Rights Reserved
-            <sub>&#xae; Version.3</sub>
-        </p>
-    </footer>
+<!-- ============ FOOTER ============ -->
+<footer class="app-footer">
+  &copy; 2024 <strong>Mohammed Alaa</strong> — All Rights Reserved &nbsp;|&nbsp; <sub>Version 4.0 Pro</sub>
+</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
+<!-- Toast -->
+<div class="toast-pro" id="toast"><i class="fas fa-info-circle"></i><span id="toastMsg">Message</span></div>
 
-				function Download (){
-				    Swal.fire({
-  title: "Download Video",
-  text: "Invalid Video Link..!",
-  icon: "error"
-});
-        
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+/* ================================================================
+   YouTube Player Pro v4.0
+   ================================================================ */
+(() => {
+  "use strict";
+
+  /* ---------- DOM ---------- */
+  const $ = id => document.getElementById(id);
+  const videoUrlInput = $("videoUrl");
+  const clearX        = $("clearX");
+  const loadVideoBtn  = $("loadVideoBtn");
+  const randomBtn     = $("randomBtn");
+  const clearBtn      = $("clearBtn");
+  const placeholder   = $("placeholder");
+  const loader        = $("loader");
+  const playerWrap    = $("playerWrap");
+  const progressStrip = $("progressStrip");
+  const progressFill  = $("progressFill");
+
+  const currentTimeEl = $("currentTime");
+  const remainingTimeEl = $("remainingTime");
+  const totalTimeEl   = $("totalTime");
+  const statusTextEl  = $("statusText");
+
+  const playPauseBtn  = $("playPauseBtn");
+  const stopBtn       = $("stopBtn");
+  const muteBtn       = $("muteBtn");
+  const fullscreenBtn = $("fullscreenBtn");
+  const loopBtn       = $("loopBtn");
+  const reloadBtn     = $("reloadBtn");
+  const back10Btn     = $("back10Btn");
+  const fwd10Btn      = $("fwd10Btn");
+  const pipBtn        = $("pipBtn");
+  const theaterBtn    = $("theaterBtn");
+  const volSlider     = $("volSlider");
+  const volLabel      = $("volLabel");
+  const speedRow      = $("speedRow");
+
+  /* ---------- STATE ---------- */
+  let ytPlayer = null;
+  let isPlaying = false;
+  let isMuted = false;
+  let isLooping = false;
+  let timeInterval = null;
+  let currentSpeed = 1;
+  let isTheater = false;
+
+  /* ---------- TOAST ---------- */
+  const toastEl = $("toast");
+  const toastMsg = $("toastMsg");
+  let toastTimer;
+  function toast(msg, type = "info", dur = 2500) {
+    clearTimeout(toastTimer);
+    toastEl.className = "toast-pro " + type;
+    toastMsg.textContent = msg;
+    toastEl.querySelector("i").className =
+      type === "success" ? "fas fa-check-circle" :
+      type === "error"   ? "fas fa-times-circle" :
+      type === "warn"    ? "fas fa-exclamation-triangle" :
+                           "fas fa-info-circle";
+    toastEl.classList.add("show");
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), dur);
+  }
+
+  /* ---------- URL PARSER ---------- */
+  function getYouTubeVideoID(url) {
+    if (!url) return null;
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) return m[1];
     }
-    
-    
-    // focus on 
-    setTimeout(function() {
-    document.getElementById("videoUrl").focus();
-}, 100);
-    
-    // set random link
-    
+    // إذا كان المعرّف مباشراً (11 حرفاً)
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url.trim())) return url.trim();
+    return null;
+  }
 
+  /* ---------- INPUT VALIDATION ---------- */
+  function checkUrlInput() {
+    const v = videoUrlInput.value.trim();
+    videoUrlInput.classList.remove("valid", "invalid");
+    clearX.style.display = v ? "block" : "none";
+    if (!v) return;
+    if (getYouTubeVideoID(v)) videoUrlInput.classList.add("valid");
+    else videoUrlInput.classList.add("invalid");
+  }
+  videoUrlInput.addEventListener("input", checkUrlInput);
+  clearX.addEventListener("click", () => {
+    videoUrlInput.value = "";
+    checkUrlInput();
+    videoUrlInput.focus();
+  });
 
-    function setValue() {
-       
-        var textToAdd = "https://youtu.be/UabdF7qqDBw?feature=shared"; // النص الذي سيتم إضافته
-        document.getElementById("videoUrl").value = textToAdd; // إضافة النص إلى خانة الإدخال
-        alert("تم استدعاء رابط")
+  /* ---------- LOAD VIDEO ---------- */
+  function loadVideo(videoID) {
+    if (!videoID) return;
+    loader.classList.add("show");
+
+    if (ytPlayer && ytPlayer.destroy) {
+      try { ytPlayer.destroy(); } catch(e) {}
     }
+    $("player").innerHTML = "";
 
-    
-    // تغييير السرعه 
-    const speedSelect = document.getElementById('speedSelect');
+    ytPlayer = new YT.Player("player", {
+      videoId: videoID,
+      playerVars: {
+        autoplay: 1,
+        rel: 0,
+        modestbranding: 1,
+        playsinline: 1,
+        origin: location.origin
+      },
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange,
+        onError: onPlayerError
+      }
+    });
+  }
 
-speedSelect.addEventListener('change', () => {
-    const speed = parseFloat(speedSelect.value);
-    player.contentWindow.postMessage(`{"event":"command","func":"setPlaybackRate","args":[${speed}]}`, '*');
-});
-    // Refresh Video
-    const reloadBtn = document.getElementById('reloadBtn');
+  function onPlayerReady() {
+    loader.classList.remove("show");
+    placeholder.classList.add("hide");
 
-// Reload the player and refresh the video
-reloadBtn.addEventListener('click', function () {
-    if (ytPlayer) {
-        ytPlayer.destroy(); // Destroy the current player
+    const btns = [playPauseBtn, stopBtn, muteBtn, fullscreenBtn, loopBtn,
+                  reloadBtn, back10Btn, fwd10Btn, pipBtn, theaterBtn];
+    btns.forEach(b => b.disabled = false);
+
+    if (ytPlayer.setVolume) ytPlayer.setVolume(100);
+    if (ytPlayer.playVideo) ytPlayer.playVideo();
+
+    clearInterval(timeInterval);
+    timeInterval = setInterval(updateTime, 500);
+
+    toast("تم تحميل الفيديو بنجاح ✨", "success");
+  }
+
+  function onPlayerError(e) {
+    loader.classList.remove("show");
+    const codes = {
+      2: "رابط غير صالح",
+      5: "خطأ في مشغل HTML5",
+      100: "الفيديو غير موجود أو خاص",
+      101: "صاحب الفيديو غير مسموح بالتضمين",
+      150: "الفيديو غير مسموح بتضمينه"
+    };
+    Swal.fire({
+      title: "خطأ في الفيديو",
+      text: codes[e.data] || "خطأ غير معروف",
+      icon: "error",
+      confirmButtonColor: "#6a5acd"
+    });
+  }
+
+  function onPlayerStateChange(event) {
+    const S = YT.PlayerState;
+    if (event.data === S.PLAYING) {
+      isPlaying = true;
+      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> إيقاف مؤقت';
+      statusTextEl.textContent = "قيد التشغيل";
+      placeholder.classList.add("hide");
+    } else if (event.data === S.PAUSED) {
+      isPlaying = false;
+      playPauseBtn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
+      statusTextEl.textContent = "متوقف مؤقتاً";
+    } else if (event.data === S.ENDED) {
+      isPlaying = false;
+      playPauseBtn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
+      statusTextEl.textContent = "انتهى";
+      if (isLooping) {
+        ytPlayer.seekTo(0);
+        ytPlayer.playVideo();
+      }
+    } else if (event.data === S.BUFFERING) {
+      statusTextEl.textContent = "تحميل...";
+    } else if (event.data === S.CUED) {
+      statusTextEl.textContent = "جاهز";
     }
-    const videoID = getYouTubeVideoID(videoUrlInput.value); // Get the current video ID
-    if (videoID) {
-        loadYouTubePlayer(videoID); // Reload the video player with the same video
+  }
+
+  /* ---------- TIME UPDATE ---------- */
+  function updateTime() {
+    if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+    try {
+      const cur = ytPlayer.getCurrentTime() || 0;
+      const dur = ytPlayer.getDuration() || 0;
+      const rem = Math.max(dur - cur, 0);
+      currentTimeEl.textContent = fmt(cur);
+      remainingTimeEl.textContent = "-" + fmt(rem);
+      totalTimeEl.textContent = fmt(dur);
+      if (dur > 0) {
+        progressFill.style.width = ((cur / dur) * 100) + "%";
+      }
+    } catch(e) {}
+  }
+
+  function fmt(s) {
+    s = Math.floor(s);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    const pad = n => String(n).padStart(2, "0");
+    return h > 0 ? `${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+  }
+
+  /* ---------- PROGRESS SEEK ---------- */
+  progressStrip.addEventListener("click", (e) => {
+    if (!ytPlayer || !ytPlayer.getDuration) return;
+    const rect = progressStrip.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    const dur = ytPlayer.getDuration();
+    if (dur) ytPlayer.seekTo(dur * pct, true);
+  });
+
+  /* ---------- CONTROLS ---------- */
+  playPauseBtn.addEventListener("click", () => {
+    if (!ytPlayer) return;
+    isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+  });
+
+  stopBtn.addEventListener("click", () => {
+    if (!ytPlayer) return;
+    ytPlayer.stopVideo();
+    isPlaying = false;
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i> تشغيل';
+    statusTextEl.textContent = "متوقف";
+  });
+
+  muteBtn.addEventListener("click", () => {
+    if (!ytPlayer) return;
+    if (isMuted) {
+      ytPlayer.unMute();
+      isMuted = false;
+      muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i> كتم';
+    } else {
+      ytPlayer.mute();
+      isMuted = true;
+      muteBtn.innerHTML = '<i class="fas fa-volume-up"></i> فتح الصوت';
     }
-});
-    
-    
-        const videoUrlInput = document.getElementById('videoUrl');
-        const loadVideoBtn = document.getElementById('loadVideoBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const volumeUpBtn = document.getElementById('volumeUpBtn');
-        const volumeDownBtn = document.getElementById('volumeDownBtn');
-        const muteBtn = document.getElementById('muteBtn');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const loopBtn = document.getElementById('loopBtn');
-        const currentTimeElement = document.getElementById('currentTime');
-        const remainingTimeElement = document.getElementById('remainingTime');
-        let ytPlayer;
-        let isMuted = false;
-        let isPlaying = false;
-        let isLooping = false;
+  });
 
-        // Helper function to extract YouTube Video ID
-        function getYouTubeVideoID(url) {
-            const regExp = /(?:https?:\/\/(?:www\.)?youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/)([a-zA-Z0-9_-]{11}))|(?:https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{11}))/;
-            const match = url.match(regExp);
-            return match ? (match[1] || match[2]) : null;
-        }
+  fullscreenBtn.addEventListener("click", () => {
+    const el = playerWrap;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    }
+  });
 
-        // Load Video
-        loadVideoBtn.addEventListener('click', function () {
-            const videoID = getYouTubeVideoID(videoUrlInput.value);
-            if (videoID) {
-                loadYouTubePlayer(videoID);
-            } else {
-                alert('Invalid YouTube URL');
-            }
-        });
+  loopBtn.addEventListener("click", () => {
+    isLooping = !isLooping;
+    loopBtn.classList.toggle("active", isLooping);
+    toast(isLooping ? "🔁 تم تفعيل التكرار" : "تم إيقاف التكرار", "info", 1800);
+  });
 
-        // Clear URL
-        clearBtn.addEventListener('click', function () {
-            videoUrlInput.value = '';
-            if (ytPlayer) {
-                ytPlayer.destroy();
-            }
-        });
+  reloadBtn.addEventListener("click", () => {
+    const id = getYouTubeVideoID(videoUrlInput.value);
+    if (id) {
+      loadVideo(id);
+      toast("جاري إعادة التحميل...", "info", 1500);
+    } else {
+      toast("لا يوجد فيديو محمّل", "warn");
+    }
+  });
 
-        // Load YouTube player
-        function loadYouTubePlayer(videoID) {
-            ytPlayer = new YT.Player('player', {
-                videoId: videoID,
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onPlaybackQualityChange': onPlayerStateChange,
-                    'onPlayerStateChange': onPlayerStateChange
-                }
-            });
-        }
+  back10Btn.addEventListener("click", () => {
+    if (!ytPlayer) return;
+    const t = ytPlayer.getCurrentTime() || 0;
+    ytPlayer.seekTo(Math.max(0, t - 10), true);
+  });
 
-        // On Player Ready
-        function onPlayerReady(event) {
-            playPauseBtn.disabled = false;
-            volumeUpBtn.disabled = false;
-            volumeDownBtn.disabled = false;
-            muteBtn.disabled = false;
-            fullscreenBtn.disabled = false;
-            stopBtn.disabled = false;
-            loopBtn.disabled = false;
+  fwd10Btn.addEventListener("click", () => {
+    if (!ytPlayer) return;
+    const t = ytPlayer.getCurrentTime() || 0;
+    ytPlayer.seekTo(t + 10, true);
+  });
 
-            // Update time every second
-            setInterval(updateTime, 1000);
-        }
+  pipBtn.addEventListener("click", async () => {
+    try {
+      const iframe = document.querySelector("#player iframe");
+      if (!iframe) return;
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+      } else if (document.pictureInPictureEnabled) {
+        await iframe.requestPictureInPicture();
+      } else {
+        toast("PiP غير مدعوم في هذا المتصفح", "warn");
+      }
+    } catch(e) {
+      toast("تعذّر تفعيل PiP", "error");
+    }
+  });
 
-        // On Player State Change
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING) {
-                isPlaying = true;
-                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-            } else if (event.data === YT.PlayerState.PAUSED) {
-                isPlaying = false;
-                playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-            }
+  theaterBtn.addEventListener("click", () => {
+    isTheater = !isTheater;
+    theaterBtn.classList.toggle("active", isTheater);
+    playerWrap.style.aspectRatio = isTheater ? "21/9" : "16/9";
+    toast(isTheater ? "🎬 وضع السينما" : "الوضع العادي", "info", 1500);
+  });
 
-            if (event.data === YT.PlayerState.ENDED && isLooping) {
-                ytPlayer.seekTo(0);
-                ytPlayer.playVideo();
-            }
-        }
+  /* ---------- VOLUME ---------- */
+  volSlider.addEventListener("input", () => {
+    const v = parseInt(volSlider.value, 10);
+    volLabel.textContent = v + "%";
+    if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(v);
+    volSlider.style.background =
+      `linear-gradient(90deg, var(--accent-2) 0%, var(--accent-2) ${v}%, rgba(255,255,255,.1) ${v}%)`;
+  });
 
-        // Update current and remaining time
-        function updateTime() {
-            const currentTime = ytPlayer.getCurrentTime();
-            const duration = ytPlayer.getDuration();
-            const remainingTime = duration - currentTime;
+  /* ---------- SPEED ---------- */
+  speedRow.addEventListener("click", (e) => {
+    const btn = e.target.closest(".speed-btn");
+    if (!btn) return;
+    currentSpeed = parseFloat(btn.dataset.speed);
+    speedRow.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    if (ytPlayer && ytPlayer.setPlaybackRate) {
+      ytPlayer.setPlaybackRate(currentSpeed);
+      toast(`⚡ السرعة: ${currentSpeed}x`, "info", 1500);
+    }
+  });
 
-            currentTimeElement.textContent = formatTime(currentTime);
-            remainingTimeElement.textContent = formatTime(remainingTime);
-        }
+  /* ---------- LOAD / CLEAR / RANDOM ---------- */
+  loadVideoBtn.addEventListener("click", () => {
+    const id = getYouTubeVideoID(videoUrlInput.value.trim());
+    if (id) {
+      loadVideo(id);
+    } else {
+      Swal.fire({
+        title: "رابط غير صالح",
+        text: "الرجاء إدخال رابط يوتيوب صحيح",
+        icon: "warning",
+        confirmButtonColor: "#6a5acd"
+      });
+    }
+  });
 
-        // Format time in mm:ss
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        }
+  videoUrlInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") loadVideoBtn.click();
+  });
 
-        // Play/Pause functionality
-        playPauseBtn.addEventListener('click', function () {
-            if (isPlaying) {
-                ytPlayer.pauseVideo();
-            } else {
-                ytPlayer.playVideo();
-            }
-        });
+  clearBtn.addEventListener("click", () => {
+    videoUrlInput.value = "";
+    checkUrlInput();
+    if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+    placeholder.classList.remove("hide");
+    statusTextEl.textContent = "—";
+    currentTimeEl.textContent = "00:00";
+    remainingTimeEl.textContent = "00:00";
+    totalTimeEl.textContent = "00:00";
+    progressFill.style.width = "0%";
+    [playPauseBtn, stopBtn, muteBtn, fullscreenBtn, loopBtn,
+     reloadBtn, back10Btn, fwd10Btn, pipBtn, theaterBtn].forEach(b => b.disabled = true);
+    toast("تم المسح", "info", 1500);
+  });
 
-        // Volume control
-        volumeUpBtn.addEventListener('click', function () {
-            const volume = ytPlayer.getVolume();
-            ytPlayer.setVolume(Math.min(volume + 10, 100));
-        });
+  const RANDOM_IDS = [
+    "dQw4w9WgXcQ","UabdF7qqDBw","9bZkp7q19f0","kJQP7kiw5Fk",
+    "3JZ_D3ELwOQ","OPf0YbXqDm0","RgKAFK5djSk","60ItHLz5WEA",
+    "fRh_vgS2dFE","CevxZvSJLk8","JGwWNGJdvx8","hT_nvWreIhg"
+  ];
+  randomBtn.addEventListener("click", () => {
+    const id = RANDOM_IDS[Math.floor(Math.random() * RANDOM_IDS.length)];
+    videoUrlInput.value = "https://www.youtube.com/watch?v=" + id;
+    checkUrlInput();
+    loadVideo(id);
+  });
 
-        volumeDownBtn.addEventListener('click', function () {
-            const volume = ytPlayer.getVolume();
-            ytPlayer.setVolume(Math.max(volume - 10, 0));
-        });
+  /* ---------- KEYBOARD SHORTCUTS ---------- */
+  document.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    if (!ytPlayer || !ytPlayer.getPlayerState) return;
+    switch (e.key) {
+      case " ":
+        e.preventDefault();
+        isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+        break;
+      case "ArrowRight":
+        ytPlayer.seekTo((ytPlayer.getCurrentTime() || 0) + 5, true); break;
+      case "ArrowLeft":
+        ytPlayer.seekTo(Math.max(0, (ytPlayer.getCurrentTime() || 0) - 5), true); break;
+      case "ArrowUp":
+        e.preventDefault();
+        volSlider.value = Math.min(100, parseInt(volSlider.value) + 10);
+        volSlider.dispatchEvent(new Event("input")); break;
+      case "ArrowDown":
+        e.preventDefault();
+        volSlider.value = Math.max(0, parseInt(volSlider.value) - 10);
+        volSlider.dispatchEvent(new Event("input")); break;
+      case "m": case "M": muteBtn.click(); break;
+      case "f": case "F": fullscreenBtn.click(); break;
+      case "l": case "L": loopBtn.click(); break;
+    }
+  });
 
-        // Mute functionality
-        muteBtn.addEventListener('click', function () {
-            if (isMuted) {
-                ytPlayer.unMute();
-                isMuted = false;
-            } else {
-                ytPlayer.mute();
-                isMuted = true;
-            }
-        });
+  /* ---------- INIT FOCUS ---------- */
+  setTimeout(() => videoUrlInput.focus(), 200);
 
-        // Fullscreen functionality
-        fullscreenBtn.addEventListener('click', function () {
-            const iframe = document.getElementById('player');
-            if (iframe.requestFullscreen) {
-                iframe.requestFullscreen();
-            } else if (iframe.mozRequestFullScreen) { // Firefox
-                iframe.mozRequestFullScreen();
-            } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari
-                iframe.webkitRequestFullscreen();
-            }
-        });
+  /* ---------- EXPOSE YT CALLBACK ---------- */
+  window.onYouTubeIframeAPIReady = () => {
+    console.log("✅ YouTube IFrame API Ready");
+  };
 
-        // Stop Video functionality
-        stopBtn.addEventListener('click', function () {
-            ytPlayer.stopVideo();
-        });
+  /* ---------- DOWNLOAD SHORTCUT ---------- */
+  window.Download = () => {
+    Swal.fire({
+      title: "تحميل الفيديو",
+      text: "هذه الميزة تتطلب خادم خلفي (Backend) — الرابط غير متاح مباشرة من المتصفح.",
+      icon: "info",
+      confirmButtonColor: "#6a5acd"
+    });
+  };
+})();
+</script>
 
-        // Loop functionality
-    
-        loopBtn.addEventListener('click', function () {
-            isLooping = !isLooping;
-            loopBtn.style.backgroundColor = isLooping ? '#ff5733' : '#757575'
-            Swal.fire({
-  title: "Note for You",
-  text: "سيتم تكرار الفيديو حين تقوم بتوقفه",
-  icon: "info",
-  color:"#3e3e4e"              
-});
-            ;
-        });
-    
-    
-     
-    </script>
 </body>
-</html>
+															</html>
